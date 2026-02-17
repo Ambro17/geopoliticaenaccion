@@ -1,0 +1,201 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "China", "label": "China", "shape": "dot", "size": 234, "title": "Frequency: 112"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Estados Unidos", "label": "Estados Unidos", "shape": "dot", "size": 116, "title": "Frequency: 53"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Rusia", "label": "Rusia", "shape": "dot", "size": 64, "title": "Frequency: 27"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Vietnam", "label": "Vietnam", "shape": "dot", "size": 34, "title": "Frequency: 12"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Uni\u00f3n Sovi\u00e9tica", "label": "Uni\u00f3n Sovi\u00e9tica", "shape": "dot", "size": 28, "title": "Frequency: 9"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Jap\u00f3n", "label": "Jap\u00f3n", "shape": "dot", "size": 28, "title": "Frequency: 9"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Clinton", "label": "Clinton", "shape": "dot", "size": 24, "title": "Frequency: 7"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Ucrania", "label": "Ucrania", "shape": "dot", "size": 22, "title": "Frequency: 6"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Acci\u00f3n", "label": "Acci\u00f3n", "shape": "dot", "size": 20, "title": "Frequency: 5"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Taiw\u00e1n", "label": "Taiw\u00e1n", "shape": "dot", "size": 20, "title": "Frequency: 5"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "India", "label": "India", "shape": "dot", "size": 20, "title": "Frequency: 5"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Obama", "label": "Obama", "shape": "dot", "size": 20, "title": "Frequency: 5"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Trump", "label": "Trump", "shape": "dot", "size": 20, "title": "Frequency: 5"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Geopol\u00edtica", "label": "Geopol\u00edtica", "shape": "dot", "size": 18, "title": "Frequency: 4"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Indo Pac\u00edfico", "label": "Indo Pac\u00edfico", "shape": "dot", "size": 18, "title": "Frequency: 4"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Yugoslavia", "label": "Yugoslavia", "shape": "dot", "size": 18, "title": "Frequency: 4"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Corea", "label": "Corea", "shape": "dot", "size": 18, "title": "Frequency: 4"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Stalin", "label": "Stalin", "shape": "dot", "size": 18, "title": "Frequency: 4"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Alemania", "label": "Alemania", "shape": "dot", "size": 18, "title": "Frequency: 4"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Dami\u00e1n", "label": "Dami\u00e1n", "shape": "dot", "size": 16, "title": "Frequency: 3"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Asia Pac\u00edfico", "label": "Asia Pac\u00edfico", "shape": "dot", "size": 16, "title": "Frequency: 3"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Singapur", "label": "Singapur", "shape": "dot", "size": 16, "title": "Frequency: 3"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Bush", "label": "Bush", "shape": "dot", "size": 16, "title": "Frequency: 3"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Biden", "label": "Biden", "shape": "dot", "size": 16, "title": "Frequency: 3"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Filipinas", "label": "Filipinas", "shape": "dot", "size": 16, "title": "Frequency: 3"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Guerra Fr\u00eda", "label": "Guerra Fr\u00eda", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Australia", "label": "Australia", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Bush Padre", "label": "Bush Padre", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Europa", "label": "Europa", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Pakist\u00e1n", "label": "Pakist\u00e1n", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Indonesia", "label": "Indonesia", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Germina", "label": "Germina", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Gran Breta\u00f1a", "label": "Gran Breta\u00f1a", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Primera Guerra Mundial", "label": "Primera Guerra Mundial", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Mongolia", "label": "Mongolia", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Taiwan", "label": "Taiwan", "shape": "dot", "size": 14, "title": "Frequency: 2"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Pablo Tanuz", "label": "Pablo Tanuz", "shape": "dot", "size": 12, "title": "Frequency: 1"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Dami\u00e1n Carca", "label": "Dami\u00e1n Carca", "shape": "dot", "size": 12, "title": "Frequency: 1"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Pablo", "label": "Pablo", "shape": "dot", "size": 12, "title": "Frequency: 1"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Mar Meridional", "label": "Mar Meridional", "shape": "dot", "size": 12, "title": "Frequency: 1"}, {"color": {"background": "#999999", "border": "#777777", "highlight": {"background": "#33C1FF", "border": "#11AAFF"}, "hover": {"background": "#AAAAAA", "border": "#888888"}}, "font": {"color": "white"}, "id": "Beijing", "label": "Beijing", "shape": "dot", "size": 12, "title": "Frequency: 1"}]);
+                  edges = new vis.DataSet([{"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Pablo Tanuz", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 3", "to": "Indo Pac\u00edfico", "value": 3}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 2", "to": "Dami\u00e1n", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Mar Meridional", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 21", "to": "Estados Unidos", "value": 21}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Beijing", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 5", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 5}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 2", "to": "Taiw\u00e1n", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 3", "to": "Singapur", "value": 3}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Asia Pac\u00edfico", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Australia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 3", "to": "Clinton", "value": 3}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 12", "to": "Rusia", "value": 12}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 2", "to": "Ucrania", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "India", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Pakist\u00e1n", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Obama", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 2", "to": "Indonesia", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 4", "to": "Vietnam", "value": 4}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Filipinas", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Trump", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 2", "to": "Stalin", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Germina", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Alemania", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Mongolia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Acci\u00f3n", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Europa", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Taiwan", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Corea", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "China", "title": "Co-occurrences: 1", "to": "Jap\u00f3n", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Mar Meridional", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Indo Pac\u00edfico", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Beijing", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Guerra Fr\u00eda", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 4", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 4}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 2", "to": "Taiw\u00e1n", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 3", "to": "Singapur", "value": 3}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Asia Pac\u00edfico", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 2", "to": "Australia", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 2", "to": "Rusia", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Ucrania", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 2", "to": "Yugoslavia", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Europa", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Clinton", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 3", "to": "Jap\u00f3n", "value": 3}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Bush", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "India", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 2", "to": "Indonesia", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 3", "to": "Vietnam", "value": 3}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Obama", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 2", "to": "Trump", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Biden", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Corea", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Estados Unidos", "title": "Co-occurrences: 1", "to": "Taiwan", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Rusia", "title": "Co-occurrences: 1", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Rusia", "title": "Co-occurrences: 1", "to": "Ucrania", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Rusia", "title": "Co-occurrences: 1", "to": "Bush Padre", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Rusia", "title": "Co-occurrences: 1", "to": "Bush", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Rusia", "title": "Co-occurrences: 2", "to": "Vietnam", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Rusia", "title": "Co-occurrences: 1", "to": "Acci\u00f3n", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Vietnam", "title": "Co-occurrences: 1", "to": "Obama", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Vietnam", "title": "Co-occurrences: 1", "to": "Jap\u00f3n", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Vietnam", "title": "Co-occurrences: 2", "to": "Singapur", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Vietnam", "title": "Co-occurrences: 2", "to": "Indonesia", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Uni\u00f3n Sovi\u00e9tica", "title": "Co-occurrences: 1", "to": "Ucrania", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Uni\u00f3n Sovi\u00e9tica", "title": "Co-occurrences: 1", "to": "Yugoslavia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Uni\u00f3n Sovi\u00e9tica", "title": "Co-occurrences: 1", "to": "Europa", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Uni\u00f3n Sovi\u00e9tica", "title": "Co-occurrences: 2", "to": "Stalin", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Uni\u00f3n Sovi\u00e9tica", "title": "Co-occurrences: 1", "to": "Mongolia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Jap\u00f3n", "title": "Co-occurrences: 1", "to": "Bush", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Jap\u00f3n", "title": "Co-occurrences: 1", "to": "Australia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Jap\u00f3n", "title": "Co-occurrences: 1", "to": "India", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Jap\u00f3n", "title": "Co-occurrences: 1", "to": "Obama", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Jap\u00f3n", "title": "Co-occurrences: 3", "to": "Corea", "value": 3}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Jap\u00f3n", "title": "Co-occurrences: 1", "to": "Filipinas", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Clinton", "title": "Co-occurrences: 1", "to": "Taiw\u00e1n", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Clinton", "title": "Co-occurrences: 1", "to": "Bush Padre", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Clinton", "title": "Co-occurrences: 1", "to": "Yugoslavia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Ucrania", "title": "Co-occurrences: 1", "to": "Corea", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Acci\u00f3n", "title": "Co-occurrences: 4", "to": "Geopol\u00edtica", "value": 4}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Acci\u00f3n", "title": "Co-occurrences: 1", "to": "Pablo", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Acci\u00f3n", "title": "Co-occurrences: 1", "to": "Dami\u00e1n Carca", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "India", "title": "Co-occurrences: 1", "to": "Bush", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "India", "title": "Co-occurrences: 1", "to": "Australia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Obama", "title": "Co-occurrences: 1", "to": "Trump", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Obama", "title": "Co-occurrences: 1", "to": "Biden", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Trump", "title": "Co-occurrences: 1", "to": "Biden", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Geopol\u00edtica", "title": "Co-occurrences: 1", "to": "Pablo", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Geopol\u00edtica", "title": "Co-occurrences: 1", "to": "Dami\u00e1n Carca", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Indo Pac\u00edfico", "title": "Co-occurrences: 1", "to": "Pablo Tanuz", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Indo Pac\u00edfico", "title": "Co-occurrences: 1", "to": "Mar Meridional", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Indo Pac\u00edfico", "title": "Co-occurrences: 1", "to": "Beijing", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Indo Pac\u00edfico", "title": "Co-occurrences: 1", "to": "Biden", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Indo Pac\u00edfico", "title": "Co-occurrences: 1", "to": "Dami\u00e1n", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Yugoslavia", "title": "Co-occurrences: 1", "to": "Europa", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Corea", "title": "Co-occurrences: 1", "to": "Filipinas", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Stalin", "title": "Co-occurrences: 1", "to": "Mongolia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Alemania", "title": "Co-occurrences: 2", "to": "Germina", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Alemania", "title": "Co-occurrences: 1", "to": "Gran Breta\u00f1a", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Alemania", "title": "Co-occurrences: 1", "to": "Primera Guerra Mundial", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Asia Pac\u00edfico", "title": "Co-occurrences: 1", "to": "Singapur", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Asia Pac\u00edfico", "title": "Co-occurrences: 1", "to": "Australia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Singapur", "title": "Co-occurrences: 1", "to": "Australia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Singapur", "title": "Co-occurrences: 2", "to": "Indonesia", "value": 2}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Bush", "title": "Co-occurrences: 1", "to": "Australia", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Germina", "title": "Co-occurrences: 1", "to": "Gran Breta\u00f1a", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Dami\u00e1n Carca", "title": "Co-occurrences: 1", "to": "Pablo", "value": 1}, {"color": {"color": "rgba(120, 120, 120, 0.15)", "highlight": "#33C1FF", "opacity": 0.15}, "from": "Mar Meridional", "title": "Co-occurrences: 1", "to": "Beijing", "value": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"physics": {"forceAtlas2Based": {"gravitationalConstant": -50, "centralGravity": 0.01, "springLength": 100, "springConstant": 0.08}, "maxVelocity": 50, "solver": "forceAtlas2Based", "timestep": 0.35, "stabilization": {"iterations": 150}}, "interaction": {"hover": true, "navigationButtons": true, "keyboard": true, "multiselect": true}, "nodes": {"font": {"size": 40, "color": "white"}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+<script type="text/javascript">
+    network.on("click", function (params) {
+        var allNodes = nodes.get();
+        var allEdges = edges.get();
+        var defaultColor = '#999999';
+        var defaultEdgeColor = 'rgba(120, 120, 120, 0.15)'; 
+        var highlightColor = '#33C1FF';
+        
+        var nodesToUpdate = [];
+        var edgesToUpdate = [];
+        
+        if (params.nodes.length > 0) {
+            var clickedNodeId = params.nodes[0];
+            var connectedNodeIds = network.getConnectedNodes(clickedNodeId);
+            var connectedEdgeIds = network.getConnectedEdges(clickedNodeId);
+            
+            var targetNodeIds = new Set(connectedNodeIds.map(String));
+            targetNodeIds.add(String(clickedNodeId));
+            
+            var targetEdgeIds = new Set(connectedEdgeIds.map(String));
+            
+            allNodes.forEach(function(node) {
+                var nidStr = String(node.id);
+                if (targetNodeIds.has(nidStr)) {
+                    node.color = {
+                        background: highlightColor,
+                        border: highlightColor,
+                        highlight: { background: highlightColor, border: highlightColor }
+                    };
+                } else {
+                    node.color = {
+                        background: defaultColor,
+                        border: '#666666',
+                        highlight: { background: highlightColor, border: highlightColor }
+                    };
+                }
+                nodesToUpdate.push(node);
+            });
+            
+            allEdges.forEach(function(edge) {
+                var eidStr = String(edge.id);
+                if (targetEdgeIds.has(eidStr)) {
+                    edge.color = { color: highlightColor, highlight: highlightColor, opacity: 1.0 };
+                    edge.width = 3; 
+                } else {
+                    edge.color = { color: defaultEdgeColor, highlight: highlightColor, opacity: 0.15 };
+                    edge.width = 1;
+                }
+                edgesToUpdate.push(edge);
+            });
+            
+        } else {
+            allNodes.forEach(function(node) {
+                node.color = {
+                    background: defaultColor,
+                    border: '#666666',
+                    highlight: { background: highlightColor, border: highlightColor }
+                };
+                nodesToUpdate.push(node);
+            });
+            
+            allEdges.forEach(function(edge) {
+                edge.color = { color: defaultEdgeColor, highlight: highlightColor, opacity: 0.15 };
+                edge.width = 1;
+                edgesToUpdate.push(edge);
+            });
+        }
+        
+        nodes.update(nodesToUpdate);
+        edges.update(edgesToUpdate);
+    });
+</script>
+</body>
+
+</html>

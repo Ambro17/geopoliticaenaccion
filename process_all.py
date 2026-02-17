@@ -22,8 +22,8 @@ def process_podcasts():
         transcripts = list(transcript_dir.glob(f"{base_name}*.txt"))
         
         if not transcripts:
-            print(f"No transcript found for {base_name}. Transcribing...")
-            transcript_path = transcribe_audio(podcast_path, model_size="tiny")
+            print(f"No transcript found for {base_name}. Skipping.")
+            continue
         else:
             # Prefer transcripts without _tiny if multiple exist, or just take first
             transcript_path = transcripts[0]
