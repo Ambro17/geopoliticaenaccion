@@ -238,51 +238,67 @@ def visualize_global_graph(G, output_file="graphs/global_graph.html"):
     # Create a nice overlay style and script
     custom_style = """
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Oswald:wght@400;700&display=swap');
+
     #node-info-panel {
         position: absolute;
         top: 20px;
         right: 20px;
-        width: 300px;
-        padding: 20px;
-        background: rgba(40, 44, 52, 0.9);
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        width: 320px;
+        padding: 25px;
+        background: rgba(15, 23, 42, 0.95);
+        color: #e2e8f0;
+        border-radius: 4px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.8);
         display: none;
         z-index: 1000;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        border: 1px solid #4a90e2;
+        font-family: 'IBM Plex Mono', monospace;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        backdrop-filter: blur(8px);
     }
     #node-info-panel h3 {
         margin-top: 0;
-        color: #f5a623;
-        border-bottom: 1px solid #4a90e2;
-        padding-bottom: 5px;
+        color: #d4af37;
+        font-family: 'Oswald', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        padding-bottom: 10px;
+        font-size: 20px;
     }
     #node-info-panel .data-label {
         font-weight: bold;
-        color: #4a90e2;
-        margin-top: 10px;
+        color: #d4af37;
+        margin-top: 15px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     #node-info-panel .transcript-list {
-        margin-top: 5px;
-        font-size: 0.9em;
-        line-height: 1.4;
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #94a3b8;
+    }
+    .transcript-bullet {
+        color: #33C1FF;
+        margin-right: 8px;
     }
     .close-panel {
         float: right;
         cursor: pointer;
         font-weight: bold;
-        color: #888;
+        color: #94a3b8;
+        font-size: 20px;
     }
     .close-panel:hover {
-        color: white;
+        color: #d4af37;
     }
 </style>
 <div id="node-info-panel">
     <span class="close-panel" onclick="document.getElementById('node-info-panel').style.display='none'">×</span>
-    <h3 id="panel-node-name">Node Info</h3>
-    <div class="data-label">Mentioned in:</div>
+    <h3 id="panel-node-name">NODE_IDENTIFIER</h3>
+    <div class="data-label">STRATEGIC_SOURCE_MAPPING:</div>
     <div id="panel-transcripts" class="transcript-list"></div>
 </div>
 """
@@ -300,7 +316,7 @@ def visualize_global_graph(G, output_file="graphs/global_graph.html"):
             // Format transcripts as a list
             var transcriptList = nodeData.transcripts || "";
             var transcripts = transcriptList.split(', ');
-            var formattedTranscripts = transcripts.map(t => '• ' + t).join('<br>');
+            var formattedTranscripts = transcripts.map(t => '<span class="transcript-bullet">•</span>' + t).join('<br>');
             document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || "N/A";
             
             panel.style.display = 'block';

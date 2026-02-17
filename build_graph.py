@@ -162,7 +162,7 @@ def visualize_graph_pyvis(G, input_file):
     net.force_atlas_2based()
     
     default_color = '#999999'
-    highlight_color = '#33C1FF'
+    highlight_color = '#f5a623'
     edge_color = 'rgba(120, 120, 120, 0.15)'
     
     for node, data in G.nodes(data=True):
@@ -175,7 +175,7 @@ def visualize_graph_pyvis(G, input_file):
             color={
                 "background": default_color,
                 "border": "#777777",
-                "highlight": {"background": highlight_color, "border": "#11AAFF"},
+                "highlight": {"background": highlight_color, "border": "#d35400"},
                 "hover": {"background": "#AAAAAA", "border": "#888888"}
             },
             font={"color": "white"}
@@ -233,7 +233,7 @@ def visualize_graph_pyvis(G, input_file):
         var allEdges = edges.get();
         var defaultColor = '#999999';
         var defaultEdgeColor = 'rgba(120, 120, 120, 0.15)'; 
-        var highlightColor = '#33C1FF';
+        var highlightColor = '#f5a623';
         
         var nodesToUpdate = [];
         var edgesToUpdate = [];
@@ -248,19 +248,26 @@ def visualize_graph_pyvis(G, input_file):
             
             var targetEdgeIds = new Set(connectedEdgeIds.map(String));
             
+            var clickedNodeIdStr = String(clickedNodeId);
             allNodes.forEach(function(node) {
                 var nidStr = String(node.id);
-                if (targetNodeIds.has(nidStr)) {
+                if (nidStr === clickedNodeIdStr) {
                     node.color = {
                         background: highlightColor,
-                        border: highlightColor,
-                        highlight: { background: highlightColor, border: highlightColor }
+                        border: '#d35400',
+                        highlight: { background: highlightColor, border: '#d35400' }
+                    };
+                } else if (targetNodeIds.has(nidStr)) {
+                    node.color = {
+                        background: highlightColor,
+                        border: '#2c3e50',
+                        highlight: { background: highlightColor, border: '#2c3e50' }
                     };
                 } else {
                     node.color = {
                         background: defaultColor,
                         border: '#666666',
-                        highlight: { background: highlightColor, border: highlightColor }
+                        highlight: { background: highlightColor, border: '#11AAFF' }
                     };
                 }
                 nodesToUpdate.push(node);
