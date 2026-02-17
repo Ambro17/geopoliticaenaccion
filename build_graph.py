@@ -12,10 +12,31 @@ from pyvis.network import Network
 try:
     nlp = spacy.load("es_core_news_lg")
 except OSError:
-    print("Downloading language model...")
-    from spacy.cli import download
-    download("es_core_news_lg")
-    nlp = spacy.load("es_core_news_lg")
+    try:
+        # Try to load from local directory if downloaded manually
+        import sys
+        import os
+        model_path = os.path.join(os.path.dirname(__file__), "es_core_news_lg-3.7.0")
+        if os.path.exists(model_path):
+            sys.path.insert(0, model_path)
+        nlp = spacy.load("es_core_news_lg")
+    except OSError:
+        print("Spanish model not found. Please run: python -m spacy download es_core_news_lg")
+        raise
+
+def get_friendly_name(filename):
+    # Remove extension
+    name = os.path.splitext(filename)[0]
+    # Remove suffixes like _tiny, _medium, etc.
+    name = re.sub(r'_(tiny|medium|small|base|large)$', '', name, flags=re.IGNORECASE)
+    # Remove leading dates (YYYY-MM-DD- or YYYY-MM-D-)
+    name = re.sub(r'^\d{4}-\d{1,2}-\d{1,2}-', '', name)
+    # Insert space before capital letters in CamelCase (e.g., CementerioDeImperios -> Cementerio De Imperios)
+    name = re.sub(r'(?<=[a-z])([A-Z])', r' \1', name)
+    # Replace hyphens/underscores with spaces
+    name = name.replace('-', ' ').replace('_', ' ')
+    # Title Case
+    return name.strip().title()
 
 def clean_text(text):
     # Remove line numbers (e.g., "1: ...")
@@ -161,24 +182,25 @@ def visualize_graph_pyvis(G, input_file):
     # Set physics layout
     net.force_atlas_2based()
     
-    default_color = '#999999'
-    highlight_color = '#f5a623'
-    edge_color = 'rgba(120, 120, 120, 0.15)'
+    friendly_podcast_name = get_friendly_name(input_file)
+    
+    default_color = '#4a90e2' # Proportional blue
+    highlight_color = '#f5a623' # Proportional orange
+    edge_color = 'rgba(200, 200, 200, 0.1)'
     
     for node, data in G.nodes(data=True):
         count = data.get('size', 1)
         net.add_node(
             node, 
-            label=node, 
-            title=f"Frequency: {count}", 
-            size=10 + count * 2,
+            label=node, # SHOW labels by default
+            value=count, # Natural scaling
+            transcripts=friendly_podcast_name, # Pass it to the JS panel
             color={
                 "background": default_color,
-                "border": "#777777",
+                "border": "#2c3e50",
                 "highlight": {"background": highlight_color, "border": "#d35400"},
-                "hover": {"background": "#AAAAAA", "border": "#888888"}
-            },
-            font={"color": "white"}
+                "hover": {"background": "#5dade2", "border": "#2c3e50"}
+            }
         )
         
     for src, dst, data in G.edges(data=True):
@@ -187,34 +209,45 @@ def visualize_graph_pyvis(G, input_file):
             src, 
             dst, 
             value=weight, 
-            title=f"Co-occurrences: {weight}",
-            color={"color": edge_color, "highlight": highlight_color, "opacity": 0.15}
+            color={"color": edge_color, "highlight": highlight_color, "opacity": 0.2}
         )
         
     net.set_options("""
     var options = {
       "physics": {
         "forceAtlas2Based": {
-          "gravitationalConstant": -50,
-          "centralGravity": 0.01,
-          "springLength": 100,
-          "springConstant": 0.08
+          "gravitationalConstant": -300,
+          "centralGravity": 0.005,
+          "springLength": 250,
+          "springConstant": 0.08,
+          "damping": 0.5
         },
-        "maxVelocity": 50,
+        "maxVelocity": 5,
+        "minVelocity": 0.1,
         "solver": "forceAtlas2Based",
-        "timestep": 0.35,
-        "stabilization": { "iterations": 150 }
+        "timestep": 0.05,
+        "stabilization": { 
+          "enabled": true,
+          "iterations": 1000,
+          "updateInterval": 50
+        },
+        "enabled": true
       },
       "interaction": {
-        "hover": true,
+        "hover": false,
         "navigationButtons": true,
-        "keyboard": true,
         "multiselect": true
       },
       "nodes": {
-        "font": {
-          "size": 40,
-          "color": "white"
+        "scaling": {
+          "min": 10,
+          "max": 50
+        }
+      },
+      "edges": {
+        "smooth": {
+          "type": "continuous",
+          "forceDirection": "none"
         }
       }
     }
@@ -226,89 +259,46 @@ def visualize_graph_pyvis(G, input_file):
     with open(output_file, 'r') as f:
         html = f.read()
         
-    script_injection = """
+    # Create a nice overlay style and script (Simplified for single graphs)
+    custom_style = """
+</style>
 <script type="text/javascript">
     network.on("click", function (params) {
-        var allNodes = nodes.get();
-        var allEdges = edges.get();
-        var defaultColor = '#999999';
-        var defaultEdgeColor = 'rgba(120, 120, 120, 0.15)'; 
-        var highlightColor = '#f5a623';
-        
-        var nodesToUpdate = [];
-        var edgesToUpdate = [];
-        
         if (params.nodes.length > 0) {
-            var clickedNodeId = params.nodes[0];
-            var connectedNodeIds = network.getConnectedNodes(clickedNodeId);
-            var connectedEdgeIds = network.getConnectedEdges(clickedNodeId);
+            var nodeId = params.nodes[0];
             
-            var targetNodeIds = new Set(connectedNodeIds.map(String));
-            targetNodeIds.add(String(clickedNodeId));
+            // Highlight neighbors logic
+            var connectedNodes = network.getConnectedNodes(nodeId);
+            var allNodes = nodes.get();
+            var nodesToUpdate = [];
             
-            var targetEdgeIds = new Set(connectedEdgeIds.map(String));
-            
-            var clickedNodeIdStr = String(clickedNodeId);
             allNodes.forEach(function(node) {
-                var nidStr = String(node.id);
-                if (nidStr === clickedNodeIdStr) {
-                    node.color = {
-                        background: highlightColor,
-                        border: '#d35400',
-                        highlight: { background: highlightColor, border: '#d35400' }
-                    };
-                } else if (targetNodeIds.has(nidStr)) {
-                    node.color = {
-                        background: highlightColor,
-                        border: '#2c3e50',
-                        highlight: { background: highlightColor, border: '#2c3e50' }
-                    };
+                if (node.id === nodeId) {
+                    node.color = { background: '#f5a623', border: '#d35400' };
+                } else if (connectedNodes.includes(node.id)) {
+                    node.color = { background: '#5dade2', border: '#2c3e50' };
                 } else {
-                    node.color = {
-                        background: defaultColor,
-                        border: '#666666',
-                        highlight: { background: highlightColor, border: '#11AAFF' }
-                    };
+                    node.color = { background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' };
                 }
                 nodesToUpdate.push(node);
             });
-            
-            allEdges.forEach(function(edge) {
-                var eidStr = String(edge.id);
-                if (targetEdgeIds.has(eidStr)) {
-                    edge.color = { color: highlightColor, highlight: highlightColor, opacity: 1.0 };
-                    edge.width = 3; 
-                } else {
-                    edge.color = { color: defaultEdgeColor, highlight: highlightColor, opacity: 0.15 };
-                    edge.width = 1;
-                }
-                edgesToUpdate.push(edge);
-            });
+            nodes.update(nodesToUpdate);
             
         } else {
+            // Reset colors
+            var allNodes = nodes.get();
+            var nodesToUpdate = [];
             allNodes.forEach(function(node) {
-                node.color = {
-                    background: defaultColor,
-                    border: '#666666',
-                    highlight: { background: highlightColor, border: highlightColor }
-                };
+                node.color = { background: '#4a90e2', border: '#2c3e50' };
                 nodesToUpdate.push(node);
             });
-            
-            allEdges.forEach(function(edge) {
-                edge.color = { color: defaultEdgeColor, highlight: highlightColor, opacity: 0.15 };
-                edge.width = 1;
-                edgesToUpdate.push(edge);
-            });
+            nodes.update(nodesToUpdate);
         }
-        
-        nodes.update(nodesToUpdate);
-        edges.update(edgesToUpdate);
     });
 </script>
-</body>
 """
-    html = html.replace('</body>', script_injection)
+
+    html = html.replace('</body>', custom_style + '</body>')
     
     with open(output_file, 'w') as f:
         f.write(html)

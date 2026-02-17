@@ -2,6 +2,7 @@ import spacy
 import networkx as nx
 import re
 from collections import Counter
+import pandas as pd
 import os
 import glob
 from pyvis.network import Network
@@ -13,7 +14,6 @@ except OSError:
     try:
         # Try to load from local directory if downloaded manually
         import sys
-        import os
         model_path = os.path.join(os.path.dirname(__file__), "es_core_news_lg-3.7.0")
         if os.path.exists(model_path):
             sys.path.insert(0, model_path)
@@ -114,9 +114,6 @@ def build_global_graph(transcript_dir="transcripts"):
         global_entity_counts.update(entities)
         
         # Build local edges to aggregate later
-        # We only care about entities that ARE entities in this specific doc
-        # But we filter by top 75 GLOBAL frequencies later.
-        # So for now, we collect all potential edges.
         for sent in doc.sents:
             sent_ents = [ent.text.strip().title() for ent in sent.ents]
             # Normalize them as we did in extraction
@@ -156,47 +153,106 @@ def build_global_graph(transcript_dir="transcripts"):
     
     return G
 
-def visualize_global_graph(G, output_file="graphs/global_graph.html"):
-    os.makedirs("graphs", exist_ok=True)
-    
-    # Height/width and dark theme
-    net = Network(height="800px", width="100%", bgcolor="#1a1a1a", font_color="white", notebook=False)
-    
-    net.force_atlas_2based()
-    
-    default_color = '#4a90e2' # A nice blue
-    highlight_color = '#f5a623' # A nice orange
-    edge_color = 'rgba(200, 200, 200, 0.1)'
-    
-    for node, data in G.nodes(data=True):
-        count = data.get('size', 1)
-        transcripts = data.get('transcripts', '')
-        
-        net.add_node(
-            node,
-            label=" ", # HIDE labels to avoid clutter by using a space
-            title=node, # Native tooltip on hover (just the name)
-            value=count, # Size by absolute frequency
-            transcripts=transcripts, # Store for custom JS
-            color={
-                "background": default_color,
-                "border": "#2c3e50",
-                "highlight": {"background": highlight_color, "border": "#d35400"},
-                "hover": {"background": "#5dade2", "border": "#2c3e50"}
-            }
-        )
-        
-    for src, dst, data in G.edges(data=True):
-        weight = data.get('weight', 1)
-        net.add_edge(
-            src, 
-            dst, 
-            value=weight,
-            color={"color": edge_color, "highlight": highlight_color, "opacity": 0.2}
-        )
+def build_semantic_graph(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        raw_text = f.read()
 
-    net.set_options("""
-    var options = {
+    cleaned_text = clean_text(raw_text)
+    doc = nlp(cleaned_text)
+
+    # Extract entities and top nouns
+    entities = []
+    
+    # Define invalid POS tags for semantic nodes (we want nouns/proper nouns)
+    invalid_pos = {'VERB', 'AUX', 'SCONJ', 'CCONJ', 'INTJ', 'ADV', 'PRON', 'DET', 'ADP', 'PART'}
+
+    # Regex for repeated characters (e.g., "Ehh", "Mmm", "Aha")
+    repeated_char_pattern = re.compile(r'(.)\1{2,}|[hm]\1+$|^\W+$')
+    
+    # Regex for vocalizations (vowels + h/m/s combinations) e.g., "Ah", "Eh", "Uh", "Mm", "Sh"
+    vocalization_pattern = re.compile(r'^(?:[aeiouáéíóúü]+[hms]*|[hms]+[aeiouáéíóúü]*)$', re.IGNORECASE)
+
+    for ent in doc.ents:
+        # 1. Filter by Entity Type
+        if ent.label_ not in ['PER', 'ORG', 'LOC', 'MISC']:
+            continue
+            
+        # 2. Check if entirely stop words
+        if all(token.is_stop for token in ent):
+            continue
+
+        # 3. Analyze composition using NLP primitives
+        if any(token.pos_ in {'VERB', 'AUX', 'INTJ', 'ADV', 'SCONJ', 'CCONJ'} for token in ent):
+             continue
+
+        # Check for Pronouns
+        if any(token.pos_ == 'PRON' for token in ent):
+            continue
+
+        # Advanced Entity Merging: strip leading determiners
+        if len(ent) > 1 and ent[0].pos_ == 'DET':
+            cleaned_ent = " ".join([t.text for t in ent[1:]]).strip()
+        else:
+            cleaned_ent = " ".join(ent.text.split())
+            
+        cleaned_ent = cleaned_ent.title()
+        
+        # 4. Phonetic / Structural Filtering
+        if repeated_char_pattern.search(cleaned_ent):
+            continue
+            
+        if len(cleaned_ent) < 4 and vocalization_pattern.match(cleaned_ent):
+            continue
+
+        if len(cleaned_ent) < 2:
+            continue
+            
+        # For single words, strict POS check
+        if len(ent) == 1:
+            token = ent[0]
+            if token.pos_ not in {'NOUN', 'PROPN'}:
+                continue
+            if token.dep_ in ['advmod', 'intj', 'cc', 'det', 'prep', 'aux', 'punct', 'mark']:
+                continue
+
+        entities.append(cleaned_ent)
+
+    # Filter very common words or noise if needed and ensure length > 2
+    entities = [e for e in entities if len(e) > 2]
+    
+    entity_counts = Counter(entities)
+    common_entities = [e for e, c in entity_counts.most_common(50)] # Top 50 entities
+
+    # Build edges based on sentence co-occurrence
+    edges = []
+    for sent in doc.sents:
+        sent_ents = [ent.text.strip() for ent in sent.ents if ent.text.strip() in common_entities]
+        sent_ents = list(set(sent_ents)) # Unique per sentence
+        
+        for i in range(len(sent_ents)):
+            for j in range(i + 1, len(sent_ents)):
+                edges.append(tuple(sorted((sent_ents[i], sent_ents[j]))))
+
+    edge_counts = Counter(edges)
+
+    # Create Graph
+    G = nx.Graph()
+    
+    for entity in common_entities:
+        G.add_node(entity, size=entity_counts[entity])
+
+    for (src, dst), weight in edge_counts.items():
+        G.add_edge(src, dst, weight=weight)
+
+    # Remove isolated nodes
+    G.remove_nodes_from(list(nx.isolates(G)))
+
+    return G
+
+def get_physics_options(enabled=True):
+    """Get physics options for the graph"""
+    if enabled:
+        return """
       "physics": {
         "forceAtlas2Based": {
           "gravitationalConstant": -300,
@@ -215,35 +271,115 @@ def visualize_global_graph(G, output_file="graphs/global_graph.html"):
           "updateInterval": 50
         },
         "enabled": true
-      },
-      "interaction": {
-        "hover": true,
+      }"""
+    else:
+        return """
+      "physics": {
+        "enabled": false
+      }"""
+
+def visualize_graph(G, output_file, is_global=False):
+    """Generates an interactive graph using pyvis with configurable physics."""
+    os.makedirs("graphs", exist_ok=True)
+    
+    # Height/width and dark theme
+    net = Network(height="800px", width="100%", bgcolor="#1a1a1a", font_color="white", notebook=False)
+    
+    # Set physics based on graph type
+    physics_enabled = is_global  # True for global, False for regular
+    
+    default_color = '#4a90e2'
+    highlight_color = '#f5a623'
+    edge_color = 'rgba(200, 200, 200, 0.1)'
+    
+    for node, data in G.nodes(data=True):
+        count = data.get('size', 1)
+        transcripts = data.get('transcripts', '')
+        
+        # For global graphs, hide labels by default, show for regular graphs
+        label = " " if is_global else node
+        
+        net.add_node(
+            node,
+            label=label,
+            title=node, # Native tooltip on hover
+            value=count,
+            transcripts=transcripts,
+            color={
+                "background": default_color,
+                "border": "#2c3e50",
+                "highlight": {"background": highlight_color, "border": "#d35400"},
+                "hover": {"background": "#5dade2", "border": "#2c3e50"}
+            }
+        )
+        
+    for src, dst, data in G.edges(data=True):
+        weight = data.get('weight', 1)
+        net.add_edge(
+            src, 
+            dst, 
+            value=weight,
+            color={"color": edge_color, "highlight": highlight_color, "opacity": 0.2}
+        )
+
+    physics_options = get_physics_options(physics_enabled)
+    
+    net.set_options(f"""
+    var options = {{
+      {physics_options},
+      "interaction": {{
+        "hover": {str(is_global).lower()},
         "navigationButtons": true,
         "multiselect": true
-      },
-      "nodes": {
-        "scaling": {
+      }},
+      "nodes": {{
+        "scaling": {{
           "min": 10,
           "max": 50
-        }
-      },
-      "edges": {
-        "smooth": {
+        }}
+      }},
+      "edges": {{
+        "smooth": {{
           "type": "continuous",
           "forceDirection": "none"
-        }
-      }
-    }
+        }}
+      }}
+    }}
     """)
     
     net.write_html(output_file)
     
-    # Inject Custom Tooltip Logic
+    # Inject Custom JavaScript for physics toggle and tooltips
     with open(output_file, 'r') as f:
         html = f.read()
 
-    # Create a nice overlay style and script
-    custom_style = """
+    # Add physics toggle button
+    initial_state = "ON" if physics_enabled else "OFF"
+    initial_bg = "rgba(74, 144, 226, 0.9)" if physics_enabled else "rgba(245, 166, 35, 0.9)"
+    
+    toggle_button = f"""
+<div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+    <button id="physics-toggle" style="
+        background: {initial_bg};
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    " onclick="togglePhysics()">
+        Physics: <span id="physics-status">{initial_state}</span>
+    </button>
+</div>
+"""
+
+    # Add tooltip panel (only for global graphs)
+    if is_global:
+        custom_style = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Oswald:wght@400;700&display=swap');
 
@@ -309,69 +445,103 @@ def visualize_global_graph(G, output_file="graphs/global_graph.html"):
     <div id="panel-transcripts" class="transcript-list"></div>
 </div>
 """
+    else:
+        custom_style = ""
 
-    script_injection = """
+    script_injection = f"""
 <script type="text/javascript">
-    network.on("click", function (params) {
+    let physicsEnabled = {str(physics_enabled).lower()};
+    
+    function togglePhysics() {{
+        physicsEnabled = !physicsEnabled;
+        network.setOptions({{ physics: {{ enabled: physicsEnabled }} }});
+        document.getElementById('physics-status').innerText = physicsEnabled ? 'ON' : 'OFF';
+        document.getElementById('physics-toggle').style.background = physicsEnabled ? 
+            'rgba(74, 144, 226, 0.9)' : 'rgba(245, 166, 35, 0.9)';
+    }}
+    
+    network.on("click", function (params) {{
         var panel = document.getElementById('node-info-panel');
-        if (params.nodes.length > 0) {
+        if (params.nodes.length > 0) {{
             var nodeId = params.nodes[0];
             var nodeData = nodes.get(nodeId);
             
-            document.getElementById('panel-node-name').innerText = nodeId;
+            {"// Update panel for global graphs" if is_global else ""}
+            {"document.getElementById('panel-node-name').innerText = nodeId;" if is_global else ""}
             
-            // Format transcripts as a list
-            var transcriptList = nodeData.transcripts || "";
-            var transcripts = transcriptList.split(', ');
-            var formattedTranscripts = transcripts.map(t => '<span class="transcript-bullet">•</span>' + t).join('<br>');
-            document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || "N/A";
+            {"// Format transcripts as a list" if is_global else ""}
+            {"var transcriptList = nodeData.transcripts || '';" if is_global else ""}
+            {"var transcripts = transcriptList.split(', ');" if is_global else ""}
+            {"var formattedTranscripts = transcripts.map(t => '<span class=\"transcript-bullet\">•</span>' + t).join('<br>');" if is_global else ""}
+            {"document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || 'N/A';" if is_global else ""}
             
-            panel.style.display = 'block';
+            {"panel.style.display = 'block';" if is_global else ""}
             
             // Highlight neighbors logic
             var connectedNodes = network.getConnectedNodes(nodeId);
             var allNodes = nodes.get();
             var nodesToUpdate = [];
             
-            allNodes.forEach(function(node) {
-                if (node.id === nodeId) {
-                    node.color = { background: '#f5a623', border: '#d35400' };
+            allNodes.forEach(function(node) {{
+                if (node.id === nodeId) {{
+                    node.color = {{ background: '#f5a623', border: '#d35400' }};
                     node.label = node.id; // Show label for selected node
-                } else if (connectedNodes.includes(node.id)) {
-                    node.color = { background: '#5dade2', border: '#2c3e50' };
+                }} else if (connectedNodes.includes(node.id)) {{
+                    node.color = {{ background: '#5dade2', border: '#2c3e50' }};
                     node.label = node.id; // Show label for neighbors
-                } else {
-                    node.color = { background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' };
-                    node.label = " "; // Keep hidden
-                }
+                }} else {{
+                    node.color = {{ background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' }};
+                    node.label = {"''" if is_global else "node.id"}; // Keep hidden for global, restore for regular
+                }}
                 nodesToUpdate.push(node);
-            });
+            }});
             nodes.update(nodesToUpdate);
             
-        } else {
-            panel.style.display = 'none';
+        }} else {{
+            {"panel.style.display = 'none';" if is_global else ""}
             // Reset colors and hide labels
             var allNodes = nodes.get();
             var nodesToUpdate = [];
-            allNodes.forEach(function(node) {
-                node.color = { background: '#4a90e2', border: '#2c3e50' };
-                node.label = " ";
+            allNodes.forEach(function(node) {{
+                node.color = {{ background: '#4a90e2', border: '#2c3e50' }};
+                node.label = {"''" if is_global else "node.id"};
                 nodesToUpdate.push(node);
-            });
+            }});
             nodes.update(nodesToUpdate);
-        }
-    });
+        }}
+    }});
 </script>
 """
-    html = html.replace('</body>', custom_style + script_injection + '</body>')
+
+    html = html.replace('</body>', toggle_button + custom_style + script_injection + '</body>')
     
     with open(output_file, 'w') as f:
         f.write(html)
     
-    print(f"Global graph saved to {output_file}")
+    print(f"Graph saved to {output_file}")
 
 if __name__ == "__main__":
-    print("Building global semantic graph...")
-    G = build_global_graph()
-    print(f"Global graph constructed with {len(G.nodes())} nodes and {len(G.edges())} edges.")
-    visualize_global_graph(G)
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Build semantic graphs")
+    parser.add_argument("--global-graph", action="store_true", help="Build global graph")
+    parser.add_argument("--input", help="Path to single transcript file")
+    args = parser.parse_args()
+    
+    if args.global_graph:
+        print("Building global semantic graph...")
+        G = build_global_graph()
+        print(f"Global graph constructed with {len(G.nodes())} nodes and {len(G.edges())} edges.")
+        visualize_graph(G, "graphs/global_graph.html", is_global=True)
+    elif args.input:
+        if not os.path.exists(args.input):
+            print(f"{args.input} not found.")
+        else:
+            print("Building graph...")
+            G = build_semantic_graph(args.input)
+            print(f"Graph created with {len(G.nodes())} nodes and {len(G.edges())} edges.")
+            base_name = os.path.splitext(os.path.basename(args.input))[0]
+            output_file = os.path.join("graphs", f"pyvis_{base_name}.html")
+            visualize_graph(G, output_file, is_global=False)
+    else:
+        print("Please specify either --global-graph or --input <file>")
