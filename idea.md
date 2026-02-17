@@ -8,8 +8,9 @@
 - [x] MVP dado un audio, transcribir a texto
 - [x] Dada la transcripcion, detectar paises y conceptos geopoliticos y graficar
 - [x] Transcribir ultimos 5 podcasts
-- [ ] Armar mapa conceptual de los ultimos 5 podcasts consolidado con link on hover sobre podcast que mencionan el topic
-- [ ] Web para interactuar con el grafo de conceptos/paises
+- [x] Web para interactuar con el grafo de conceptos/paises
+- [x] Armar mapa conceptual de los ultimos 5 podcasts consolidado con referencia al podcast que mencionan el topic
+- [ ] Add single source of truth file for mp3, podcast link, transcript, and graph for easier mapping in the graph from node to podcast links
 - [ ] LLM Chat Interface to query knowledge graphs, get recommended podcasts
 - [ ] LLM Summary of podcast topics.
 - [ ] LLM for book/movie/reference extractions
