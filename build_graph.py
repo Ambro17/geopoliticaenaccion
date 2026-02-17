@@ -79,8 +79,8 @@ def build_semantic_graph(file_path):
         if any(token.pos_ == 'PRON' for token in ent):
             continue
 
-        # Clean the text
-        cleaned_ent = ent.text.strip()
+        # Clean the text and normalize whitespace
+        cleaned_ent = " ".join(ent.text.split())
         
         # 4. Phonetic / Structural Filtering (The "No Hardcoding" Approach)
         
@@ -204,6 +204,12 @@ def visualize_graph_pyvis(G, input_file):
         "navigationButtons": true,
         "keyboard": true,
         "multiselect": true
+      },
+      "nodes": {
+        "font": {
+          "size": 40,
+          "color": "white"
+        }
       }
     }
     """)
