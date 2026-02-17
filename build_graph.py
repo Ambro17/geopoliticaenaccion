@@ -79,8 +79,14 @@ def build_semantic_graph(file_path):
         if any(token.pos_ == 'PRON' for token in ent):
             continue
 
-        # Clean the text and normalize whitespace
-        cleaned_ent = " ".join(ent.text.split())
+        # Advanced Entity Merging: strip leading determiners (articles) using spaCy POS
+        # and normalize to Title Case for consistency
+        if len(ent) > 1 and ent[0].pos_ == 'DET':
+            cleaned_ent = " ".join([t.text for t in ent[1:]]).strip()
+        else:
+            cleaned_ent = " ".join(ent.text.split())
+            
+        cleaned_ent = cleaned_ent.title()
         
         # 4. Phonetic / Structural Filtering (The "No Hardcoding" Approach)
         
