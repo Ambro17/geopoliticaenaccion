@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoPolVis - Podcast Semantic Graphs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --sidebar-bg: #1e293b;
+            --panel-bg: #0f172a;
+            --accent-gold: #d4af37;
+            --accent-blue: #33C1FF;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: rgba(148, 163, 184, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
+                url('https://www.transparenttextures.com/patterns/carbon-fibre.png'),
+                radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        }
+
+        /* Subtle Grid Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: 90vh;
+            position: relative;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 40px 25px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .sidebar h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 32px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+        }
+
+        .sidebar .subtitle {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .graph-list {
+            list-style: none;
+        }
+
+        .section-header {
+            font-size: 11px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .graph-item {
+            padding: 18px;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .graph-item:hover {
+            border-color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .graph-item.active {
+            border-left: 5px solid var(--accent-gold);
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--accent-gold);
+        }
+
+        .graph-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+        }
+
+        .graph-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .main-content {
+            padding: 40px;
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            margin-bottom: 30px;
+            border-left: 4px solid var(--accent-gold);
+            padding-left: 20px;
+        }
+
+        .header h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 42px;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header .description {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .graph-viewer {
+            flex: 1;
+            background: #111111;
+            border: 1px solid var(--border-color);
+            position: relative;
+            min-height: 600px;
+        }
+
+        .graph-viewer iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .hud-scanline {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.1;
+        }
+
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .placeholder-icon {
+            font-size: 80px;
+            margin-bottom: 25px;
+            color: var(--accent-gold);
+            opacity: 0.4;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--accent-gold);
+        }
+
+        .spinner {
+            border: 2px solid rgba(212, 175, 55, 0.1);
+            border-top: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>GEOPOL-INT</h1>
+            <p class="subtitle">STRATEGIC SEMANTIC DATASET</p>
+            
+            <div class="section-header">Intelligence Reports</div>
+            <ul class="graph-list" id="graph-list">
+                <!-- Graphs will be populated here -->
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h2 id="selected-title">INTEL-OPS CENTER</h2>
+                <p class="description" id="selected-description">AWAITING MISSION BRIEFING SELECTION</p>
+            </div>
+
+            <div class="graph-viewer" id="graph-viewer">
+                <div class="hud-scanline"></div>
+                <div class="placeholder" id="placeholder">
+                    <div class="placeholder-icon">📡</div>
+                    <div class="placeholder-text">SYSTEM STANDBY // NO DATASET MOUNTED</div>
+                    <div class="placeholder-hint">INITIALIZE REPORT SELECTION FROM SIDEBAR UNIT</div>
+                </div>
+                <div class="loading hidden" id="loading">
+                    <div class="spinner"></div>
+                    <div>Loading graph...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Available graphs - update this list when new graphs are added
+        // Only pyvis graphs are included (not Plotly graphs)
+        const graphs = [
+            {
+                name: 'Chile',
+                file: 'pyvis_Chile.html',
+                description: 'Southern Cone Strategic Alignment Analysis'
+            },
+            {
+                name: 'Venezuela',
+                file: 'pyvis_Venezuela.html',
+                description: 'Bolivarian Regional Stability Assessment'
+            },
+            {
+                name: 'Malvinas',
+                file: 'pyvis_2025-07-13-Malvinas.html',
+                description: 'South Atlantic Sovereignty & Maritime Hegemony'
+            },
+            {
+                name: 'China',
+                file: 'pyvis_2025-08-06-China.html',
+                description: 'Global Supply Chain & Asia-Pacific Power Dynamics'
+            },
+            {
+                name: 'Cementerio Imperios',
+                file: 'pyvis_2025-08-16-CementerioDeImperios_tiny.html',
+                description: 'Central Asian Historical Conflict Patterns'
+            },
+            {
+                name: '2da Guerra Mundial',
+                file: 'pyvis_2025-08-27-2da-Guerra-Mundial_medium.html',
+                description: 'Total War & Post-1945 Order Reconstruction'
+            },
+            {
+                name: 'Medio Oriente',
+                file: 'pyvis_2025-10-4-Medio-Oriente_tiny.html',
+                description: 'Levantine & Gulf State Tactical Intersections'
+            }
+        ];
+
+        let currentGraph = null;
+
+        // Populate graph list
+        function populateGraphList() {
+            const graphList = document.getElementById('graph-list');
+            
+            graphs.forEach((graph, index) => {
+                const li = document.createElement('li');
+                li.className = 'graph-item';
+                li.dataset.index = index;
+                li.innerHTML = `
+                    <div class="graph-name">${graph.name}</div>
+                    <div class="graph-meta">${graph.description}</div>
+                `;
+                
+                li.addEventListener('click', () => loadGraph(index));
+                graphList.appendChild(li);
+            });
+        }
+
+        // Load a graph
+        function loadGraph(index) {
+            const graph = graphs[index];
+            
+            // Update active state
+            document.querySelectorAll('.graph-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+
+            // Update header
+            document.getElementById('selected-title').textContent = graph.name;
+            document.getElementById('selected-description').textContent = graph.description;
+
+            // Show loading
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+
+            // Remove existing iframe if any
+            const existingIframe = document.querySelector('#graph-viewer iframe');
+            if (existingIframe) {
+                existingIframe.remove();
+            }
+
+            // Create and load iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = `graphs/${graph.file}`;
+            iframe.onload = () => {
+                document.getElementById('loading').classList.add('hidden');
+            };
+            iframe.onerror = () => {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('placeholder').classList.remove('hidden');
+                document.querySelector('.placeholder-text').textContent = 'Error loading graph';
+                document.querySelector('.placeholder-hint').textContent = 'The graph file could not be loaded';
+            };
+
+            document.getElementById('graph-viewer').appendChild(iframe);
+            currentGraph = index;
+        }
+
+        // Initialize
+        populateGraphList();
+
+        // Optional: Auto-load first graph
+        // loadGraph(0);
+    </script>
+</body>
+</html>

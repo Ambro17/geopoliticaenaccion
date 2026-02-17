@@ -1,0 +1,15 @@
+[project]
+name = "geopolvis"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "faster-whisper>=1.2.1",
+    "flask>=3.0.0",
+    "spacy>=3.7.0",
+    "networkx>=3.2.0",
+    "plotly>=5.18.0",
+    "pyvis>=0.3.2",
+    "pandas>=2.0.0",
+]
