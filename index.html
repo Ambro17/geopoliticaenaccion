@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoPolVis - Podcast Semantic Graphs</title>
+    <title>GeoPolVis - Grafos Semánticos de Podcasts</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
@@ -370,37 +370,37 @@
     <div class="container">
         <div class="sidebar">
             <h1>GEOPOL-INT</h1>
-            <p class="subtitle">STRATEGIC SEMANTIC DATASET</p>
+            <p class="subtitle">DATASET SEMÁNTICO ESTRATÉGICO</p>
             
-            <div class="section-header">Intelligence Reports</div>
+            <div class="section-header">Informes de Inteligencia</div>
             <ul class="graph-list" id="graph-list">
-                <!-- Graphs will be populated here -->
+                <!-- Los grafos se cargan acá -->
             </ul>
         </div>
 
         <div class="main-content">
             <div class="header">
-                <h2 id="selected-title">INTEL-OPS CENTER</h2>
-                <p class="description" id="selected-description">AWAITING MISSION BRIEFING SELECTION</p>
+                <h2 id="selected-title">CENTRO DE OPERACIONES</h2>
+                <p class="description" id="selected-description">ESPERANDO SELECCIÓN DE INFORME</p>
             </div>
 
             <div class="graph-viewer" id="graph-viewer">
                 <div class="hud-scanline"></div>
                 <div class="placeholder" id="placeholder">
                     <div class="placeholder-icon">📡</div>
-                    <div class="placeholder-text">SYSTEM STANDBY // NO DATASET MOUNTED</div>
-                    <div class="placeholder-hint">INITIALIZE REPORT SELECTION FROM SIDEBAR UNIT</div>
+                    <div class="placeholder-text">SISTEMA EN ESPERA // SIN DATASET CARGADO</div>
+                    <div class="placeholder-hint">SELECCIONÁ UN INFORME DESDE EL PANEL LATERAL</div>
                 </div>
                 <div class="loading hidden" id="loading">
                     <div class="spinner"></div>
-                    <div>Loading graph...</div>
+                    <div>Cargando grafo...</div>
                 </div>
             </div>
             <div class="insights-panel hidden" id="insights-panel">
                 <div class="tabs-nav">
-                    <button class="tab-btn active" data-target="tab-summary">SUMMARY</button>
-                    <button class="tab-btn" data-target="tab-highlights">HIGHLIGHTS</button>
-                    <button class="tab-btn" id="btn-references" data-target="tab-references">REFERENCES</button>
+                    <button class="tab-btn active" data-target="tab-summary">RESUMEN</button>
+                    <button class="tab-btn" data-target="tab-highlights">DESTACADOS</button>
+                    <button class="tab-btn" id="btn-references" data-target="tab-references">REFERENCIAS</button>
                 </div>
                 <div class="tab-content active" id="tab-summary"></div>
                 <div class="tab-content" id="tab-highlights"></div>
@@ -523,8 +523,8 @@
             iframe.onerror = () => {
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('placeholder').classList.remove('hidden');
-                document.querySelector('.placeholder-text').textContent = 'Error loading graph';
-                document.querySelector('.placeholder-hint').textContent = 'The graph file could not be loaded';
+                document.querySelector('.placeholder-text').textContent = 'Error al cargar el grafo';
+                document.querySelector('.placeholder-hint').textContent = 'No se pudo cargar el archivo del grafo';
             };
 
             document.getElementById('graph-viewer').appendChild(iframe);
@@ -536,10 +536,10 @@
             if (graphAnalysis) {
                 document.getElementById('insights-panel').classList.remove('hidden');
                 
-                document.getElementById('tab-summary').innerHTML = graphAnalysis.summary || '<div class="analysis-content"><p>No summary available.</p></div>';
+                document.getElementById('tab-summary').innerHTML = graphAnalysis.summary || '<div class="analysis-content"><p>No hay resumen disponible.</p></div>';
                 
                 const highlightsObj = graphAnalysis.highlights || '';
-                document.getElementById('tab-highlights').innerHTML = highlightsObj || '<div class="analysis-content"><p>No highlights available.</p></div>';
+                document.getElementById('tab-highlights').innerHTML = highlightsObj || '<div class="analysis-content"><p>No hay destacados disponibles.</p></div>';
                 
                 const refObj = graphAnalysis.references || '';
                 const refTab = document.getElementById('tab-references');
