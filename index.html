@@ -256,6 +256,114 @@
             background: var(--accent-gold);
             opacity: 0.5;
         }
+
+        .insights-panel {
+            margin-top: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            min-height: 250px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 15px 25px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-gold);
+            border-bottom-color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 25px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-main);
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .analysis-content h3, .analysis-content h4 {
+            color: var(--accent-gold);
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            margin-top: 20px;
+        }
+        
+        .analysis-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .analysis-content p {
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+
+        .analysis-content ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .analysis-content li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+        }
+
+        .analysis-content li:before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .highlight-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent-blue);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -287,6 +395,16 @@
                     <div class="spinner"></div>
                     <div>Loading graph...</div>
                 </div>
+            </div>
+            <div class="insights-panel hidden" id="insights-panel">
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-target="tab-summary">SUMMARY</button>
+                    <button class="tab-btn" data-target="tab-highlights">HIGHLIGHTS</button>
+                    <button class="tab-btn" id="btn-references" data-target="tab-references">REFERENCES</button>
+                </div>
+                <div class="tab-content active" id="tab-summary"></div>
+                <div class="tab-content" id="tab-highlights"></div>
+                <div class="tab-content" id="tab-references"></div>
             </div>
         </div>
     </div>
@@ -321,12 +439,12 @@
                 description: 'Cadena de suministro global y dinámica de poder en Asia-Pacífico'
             },
             {
-                name: 'Cementerio Imperios',
-                file: 'pyvis_2025-08-16-CementerioDeImperios_tiny.html',
-                description: 'Patrones históricos de conflicto en Asia Central'
+                name: 'Primera Guerra Mundial',
+                file: 'pyvis_2025-08-16-CementerioDeImperios_medium.html',
+                description: 'Cementerio de imperios'
             },
             {
-                name: '2da Guerra Mundial',
+                name: 'Segunda Guerra Mundial',
                 file: 'pyvis_2025-08-27-2da-Guerra-Mundial_medium.html',
                 description: 'Guerra total y reconstrucción del orden post-1945'
             },
@@ -338,6 +456,21 @@
         ];
 
         let currentGraph = null;
+
+        const analysisDataCache = {"pyvis_2025-10-4-Medio-Oriente_tiny.html":{"summary":"<div class='analysis-content'><p>The podcast shifts its focus to an overarching view of the Middle East, highlighting current geopolitical hotspots and the complex dynamics among regional actors such as Saudi Arabia, Israel, Turkey, and Iran. It notes a significant disconnect between ongoing peace proposals, like the Trump/Netanyahu plan, and the independent military and diplomatic maneuvers of these regional powers. Examples include Saudi Arabia's defense pact with nuclear Pakistan and Turkey's pursuit of F-35 fighter jets from the US, suggesting these actors anticipate continued instability rather than an imminent peaceful resolution. The discussion begins by defining the Middle East both conceptually and geographically, acknowledging its fluid boundaries and the profound historical influence of external powers in shaping its identity and conflicts.</p><p>A core argument is that much of the region's geopolitical activity results from external intervention—historically by Europe, and more recently by the US, USSR, and China—which often exploits internal fractures. The hosts clarify that Arab identity is primarily linguistic, not purely religious, and that the vast Muslim population is highly diverse, comprising Turks, Persians, and Arabs, with distinct Sunni and Shia branches. This diversity debunks the myth that religious unity dictates alliances; instead, specific national interests frequently override religious solidarity. The historical role of Islamic leaders as both religious and political figures also blurs the lines between spiritual and temporal authority, making a strictly secular approach challenging in the region.</p><p>The Middle East's geopolitical significance is anchored in its critical trade routes, including the Suez Canal, Bab el-Mandeb, and the Strait of Hormuz (through which a vast majority of the region's oil passes), as well as its immense energy resources of oil and gas. The podcast explains that the US presence in the region since 2001 is not driven by a need for its own oil, but rather by a strategic imperative to control global energy flows, particularly those vital to potential adversaries like China, which relies heavily on Gulf oil. This US strategy is characterized as maintaining \"controlled instability\"—preventing total regional warfare while ensuring continued influence and making allies, such as Israel, more dependent. The recent Hamas attack on October 7, 2023, is presented as having effectively disrupted nascent peace initiatives, further reinforcing this dynamic of instability and renewed US initiative in the region.</p></div>","highlights":"<div class='analysis-content'><ul><li>A common misconception is clarified: not all Arabs are Muslims, nor are all Muslims Arabs, a fundamental distinction for understanding the region's diverse identities.</li><li>The podcast argues that religion, while a conditioning factor, is not the sole determinant of Middle Eastern geopolitics, with national interests and power struggles often overriding religious solidarity.</li><li>The 2001 US intervention in Iraq is presented as a geopolitical success, not a failure, as it achieved strategic objectives like creating controlled instability and controlling energy flows vital for countering potential adversaries like China, rather than its stated goal of democracy promotion.</li></ul></div>","references":"<div class='analysis-content'></div>","transcript":"2025-10-4-Medio-Oriente_tiny.txt"},"pyvis_Chile.html":{"summary":"<div class='analysis-content'><p>The podcast proposes a hypothetical confederation of Southern Cone countries (Argentina, Chile, and potentially Uruguay) to establish bioceanic control over the South Atlantic and Pacific, secure interoceanic passages, and project influence into Antarctica, all within an alliance with the United States to exclude extracontinental powers. This vision challenges traditional geopolitical thinking in the region, particularly highlighting the 'fictitious' nature of the Argentine-Chilean border.</p><p>The discussion elaborates on the historical roots of division, attributing it to 19th-century British \"divide and conquer\" strategies that drew borders to prevent unified control of strategic geographical points. It debunks the idea of inherent conflict between Argentina and Chile, referencing their shared independence struggles and contrasting this with later disputes (e.g., 1978 near-war) fueled by external interests. The concept of a voluntary confederation is introduced as a way to overcome these historical divisions and maximize regional strength.</p><p>The analysis shifts to contemporary geopolitical challenges, including renewed US interest in the hemisphere (a 'corolario Trump de la doctrina Monroe' and increased fleet presence), the significant and often predatory influence of China (through 'complementary economies' leading to trade deficits), and the ongoing European and Brazilian aspirations for regional power. The podcast argues that current ideological divisions and nationalistic sentiments are exploited by these external actors, and calls for Argentina and Chile to align with the US to form a strong Southern Cone bloc, countering a potential China-Brazil axis and securing their collective future against external exploitation.</p></div>","highlights":"<div class='analysis-content'><ul><li>The podcast controversially asserts that the border between Argentina and Chile, and even the existence of Uruguay, were deliberately drawn by Great Britain in the 19th century as a \"divide and conquer\" strategy to prevent any single Southern Cone nation from controlling strategic bioceanic passages and the Río de la Plata.</li><li>A key opinion advanced is that ideology serves merely as a \"tool of geopolitics,\" not a fundamental driver of state decisions. Nationalist chauvinism between Argentina and Chile is presented as an ideological instrument that exclusively benefits extracontinental powers (like the UK) by maintaining division, rather than serving the genuine interests of the Southern Cone nations.</li><li>The podcast forecasts a significant re-centering of US foreign policy on its own hemisphere, evidenced by a 'corolario Trump de la doctrina Monroe' and recent military deployments. It urges Southern Cone countries, particularly Chile and Argentina, to align with the US to form a \"Confederation of the South,\" thereby creating a powerful bloc to control strategic interoceanic passages and counter the growing influence of China and other \"non-hemispheric\" powers.</li></ul></div>","references":"<div class='analysis-content'><ul><li>Memorias (by Kissinger)</li></ul></div>","transcript":"Chile.txt"},"pyvis_Venezuela.html":{"summary":"<div class='analysis-content'><p>The discussion begins by analyzing the recent events in Venezuela, framing Maduro's removal and the subsequent stability of the government as a clear demonstration of explicit US power projection under Donald Trump. This action is seen as part of a broader re-engagement with the US's own hemisphere, aiming to limit the influence of extracontinental powers like China, Russia, and Europe, rather than primarily being about Venezuela's oil resources.</p><p>The conversation then expands to the overarching US geopolitical strategy, distinguishing its Euroasian front from its hemispheric one, and interpreting Trump's direct approach as a revitalization of the Monroe Doctrine. This redefinition of US foreign policy seeks to consolidate its continental influence, potentially reshaping South American power dynamics, challenging existing British influence in the region (e.g., Malvinas/Falklands), and influencing countries like Argentina and Brazil in their alignment with global powers.</p><p>Finally, the analysts project this US continental consolidation to North America, addressing Canada and Greenland in the context of Arctic control against European and Russian expansion due to climate change. They conclude that the US is undergoing a significant shift in its defense architecture, shedding past hypocrisies with Europe to assert its dominance within its sphere of influence, leading to anticipated diplomatic confrontations rather than direct military ones from other global powers in the Americas.</p></div>","highlights":"<div class='analysis-content'><ul><li>Donald Trump's foreign policy approach marks a significant shift, as he has explicitly demonstrated US power projection without the need for moral excuses or pretexts, unlike previous administrations.</li><li>Argentina possesses a unique geopolitical opportunity to reclaim the Malvinas/Falkland Islands with US support, potentially by offering a concession for the Mont Plesant military base to the United States as part of a broader reassertion of the Monroe Doctrine.</li><li>The United States and Russia are described as \"natural allies\" with historically coincident geopolitical interests, primarily driven by shared concerns regarding neighboring powers such as China and Europe.</li></ul></div>","references":"<div class='analysis-content'><ul><li>The Man in the High Castle (series)</li><li>Spickman's book on United States (1942)</li></ul></div>","transcript":"Venezuela.txt"},"pyvis_2025-07-13-Malvinas.html":{"summary":"<div class='analysis-content'><p>The podcast initiates a discussion on the geopolitics of the South Atlantic, prompted by a recent 'Economies' article detailing alleged secret UK-Argentina meetings regarding the Malvinas (Falkland Islands) sovereignty. The hosts, Mauro La Bombarda and Saturnino Funes, set out to analyze the complex scenario realistically, identifying key global actors such as the militarily occupying Great Britain, China with its vast fishing fleet, and the United States, which is actively engaging with Argentina and rearming its forces, signaling a desire to establish a firmer foothold in the region.</p><p>The analysis delves into the historical context of the Monroe Doctrine, highlighting the US's long-standing policy of expelling extracontinental powers from the Americas and its consistent non-recognition of British sovereignty over Malvinas. This US stance, the hosts argue, is heavily reliant on Argentina maintaining its sovereignty claim. Regional actors like Brazil, Chile, and Uruguay are also examined for their logistical support to the British presence, driven by their own geopolitical interests and Argentina's inconsistent foreign policy. The podcast asserts that natural alliances in the Southern Cone (e.g., Brazil-UK-Chile against Argentina-Peru) are shaped by this balance of power.</p><p>The hosts critically dismantle the 'Economies' article's proposal, which suggests UK-Argentina cooperation against China in exchange for lifting a rearmament veto and recognizing the UK's \"discreet role\" in the South Atlantic. They argue that US-led rearmament doesn't require British permission and that the UK's history of close ties with China makes its anti-China stance questionable. The discussion concludes by advocating for a continental alliance with the United States to regain control of the South Atlantic, expel all extracontinental powers, including the UK and China, and secure Argentina's sovereignty over Malvinas, potentially offering strategic concessions like a military base to the US.</p></div>","highlights":"<div class='analysis-content'><ul><li>The podcast asserts a \"constructive\" relationship between Great Britain and China in the South Atlantic, highlighting that China's fishing fleet often seeks permits from Malvinas authorities with the implicit anuencia of the British military, directly contrasting the 'Economies' article's premise of UK-Argentina cooperation against China.</li><li>The hosts directly debunk the British offer to lift their veto on Argentine rearmament, arguing that if the United States is supplying advanced military equipment like F-16s, the British veto becomes irrelevant as the US would not seek permission from the UK.</li><li>A core forecast and opinion is that Argentina's most effective strategy to regain control of the South Atlantic involves forming a continental alliance with the United States to expel *all* extracontinental powers (Great Britain and China), rather than cooperating with one against the other.</li></ul></div>","references":"<div class='analysis-content'></div>","transcript":"2025-07-13-Malvinas.txt"},"pyvis_2025-08-27-2da-Guerra-Mundial_medium.html":{"summary":"<div class='analysis-content'><p>The podcast \"Geopolítica en Acción\" with Mauro La Bombarda and Dr. Saturnino Funes dedicates this episode to the Second World War, not as a historical recount of battles, but through a geopolitical lens, focusing on state interests and Realpolitik. The hosts justify this approach by explaining that understanding current global events, particularly the post-Cold War era, requires a deep comprehension of the Cold War, which in turn is rooted in the outcomes of both World Wars. They emphasize analyzing the political objectives of the combatants rather than engaging in moral judgments, asserting that \"malos fueron todos\" in the context of war atrocities.</p><p>The discussion delves into the interwar period, highlighting how the dissolution of the German, Austro-Hungarian, and Ottoman empires after World War I, coupled with the rise of the Soviet Union, created a new geopolitical landscape. Great Britain, traditionally the guarantor of European balance, viewed the expansionist Soviet Union as a threat. Recognizing the mistake of the Treaty of Versailles, which left Germany humiliated but not disarmed, Britain covertly supported Germany's rearmament, particularly under the vehemently anti-communist Hitler, with the objective of creating a bulwark against Soviet expansion. This strategy involved tacitly allowing Hitler's initial territorial gains in the west and culminated in Hitler's offer to Britain for a division of power (Germany as continental hegemon, Britain as maritime power) before turning east, an offer Churchill ultimately rejected.</p><p>Following Britain's refusal, Hitler invaded the Soviet Union (Operation Barbarossa), an attack undertaken with a pan-European force, signaling a desire for European unification under German leadership. Crucially, the United States, which had initially remained aloof, entered the war following Pearl Harbor and formed a vital, unconditional alliance with Russia, providing extensive material aid. This alliance, driven by a shared interest in preventing the encirclement of their respective \"island\" continents (North America and Russia) by a unified Eurasia (German-controlled Europe and Japanese-controlled Asia), ultimately led to the defeat of Germany. The podcast concludes by identifying the United States and Russia as the true victors, having achieved their core geopolitical objectives, while the European powers (Britain, France, Germany, Italy), and Japan, suffered significant losses, including the dismantling of their empires and reconstruction efforts largely dictated by the US. This analysis provides a framework for understanding contemporary global power dynamics, including ongoing tensions between the US and Europe regarding Russia.</p></div>","highlights":"<div class='analysis-content'><ul><li>The notion that the evacuation of Dunkirk was solely a heroic British resistance is a myth. The German Chancellor Hitler deliberately allowed British troops to escape, driven by a geopolitical strategy to pressure Great Britain into an alliance against the Soviet Union, not out of military weakness or British heroism.</li><li>A controversial analysis of the Holocaust suggests that Great Britain, despite its theoretical opposition to Nazi Germany, actively impeded Jewish refugees from reaching Palestine, a British mandate. This policy, driven by the British interest in maintaining its empire and not antagonizing Arab populations, meant prioritizing imperial control over humanitarian intervention, even in the face of immense atrocities.</li><li>The podcast argues that the core geopolitical interests that defined the US-Russia alliance during World War II—preventing the unification and dominance of Eurasia by a single power—continue to shape contemporary global relations. This perspective suggests that current US policies, even when seemingly contradictory to European interests, reflect a deep-seated, permanent alignment with Russia against a unified, German-led Europe.</li></ul></div>","references":"<div class='analysis-content'><ul><li>La Guerra y la Paz</li><li>The Pacific</li><li>Dissuación o Defensa</li><li>Orden Mundial</li><li>Arde París</li></ul></div>","transcript":"2025-08-27-2da-Guerra-Mundial_medium.txt"},"pyvis_2025-08-16-CementerioDeImperios_medium.html":{"summary":"<div class='analysis-content'><p>This podcast episode, dedicated to the First World War, positions it as an integral part of a larger historical period spanning into the Second World War. It begins by discussing the war's immediate impact, including the collapse of four empires and the emergence of the United States as a global power, framing the conflict as a 'hinge' event that triggered subsequent geopolitical processes like the Russian Revolution and the rise of totalitarianism.</p><p>The discussion then delves into the concept of the European 'balance of power' system, tracing its origins to the Peace of Westphalia in 1648 and its eventual breakdown leading up to 1914. A key focus is the rise of a unified Germany, which challenged Britain's naval supremacy and destabilized the flexible alliance system, transforming it into rigid, armed blocs. The Middle Eastern front is highlighted, detailing Britain's strategy to destabilize the Ottoman Empire through Arab revolts, the Sykes-Picot Agreement, and the growing importance of oil, which fundamentally reshaped the region's geopolitical landscape.</p><p>The year 1917 is identified as a pivotal moment, marked by Russia's exit from the war following the Bolshevik Revolution—a development facilitated by Germany—and the decisive entry of the United States. America's strategic timing and fresh resources are credited with breaking the Western Front's stalemate and ultimately swinging the war in favor of the Allies. The episode concludes by examining the Treaty of Versailles, which, despite American idealism, imposed punitive terms on Germany, fueling resentment and laying the groundwork for future conflicts, thus setting the stage for the interwar period and the Second World War.</p></div>","highlights":"<div class='analysis-content'><ul><li>The term \"First World War\" was a retrospective construction; those who lived through it referred to it as \"the Great War,\" believing it would end all wars.</li><li>According to academic Merheimer, Germany's decision to build a fleet to compete with Great Britain was one of the most irrational geopolitical decisions in history, driven by internal caprice rather than strategic vision.</li><li>John Maynard Keynes, commenting on the Treaty of Versailles, famously stated it was not a peace but an armistice; Henry Kissinger later described it as \"too harsh for Germany to accept, but not harsh enough to prevent it from challenging it in the future.\"</li></ul></div>","references":"<div class='analysis-content'><ul><li>Cómo piensan los estados</li><li>Los siete pilares de la Zavibría</li><li>Lawrence de Arabia</li></ul></div>","transcript":"2025-08-16-CementerioDeImperios_medium.txt"},"pyvis_2025-08-06-China.html":{"summary":"<div class='analysis-content'><p>The podcast \"Geopolítica en Acción\", featuring Pablo Tanuz and Damián Carca, delves into the South China Sea and the broader Indo-Pacific as a critical arena for contemporary international politics. The discussion frames this region as central to the escalating rivalry between the United States and China. Historically, the US aimed to prevent any single power from achieving regional hegemony, a policy dating back to the Cold War's containment strategy against communism. This objective even led to a period of shared US-China interest in limiting Soviet influence, exemplified by the Mao-Nixon rapprochement and the Shanghai Communiqué.</p><p>Following the Soviet Union's collapse, the US initially adopted a more relaxed stance, influenced by the \"end of history\" hypothesis, which led to a perceived \"neglect\" of the region. However, events like the Third Taiwan Strait Crisis in 1996 and China's entry into the WTO, which significantly boosted its economic and military might, gradually re-alerted Washington. Despite some internal foresight regarding China's potential as a rival, the US's primary focus shifted to the War on Terror post-2000, allowing China's influence to grow further. Consequently, regional actors such as Japan and Vietnam, increasingly apprehensive of China's assertiveness, began to call for a stronger US military presence.</p><p>In response, the US initiated a </div>","highlights":"<div class='analysis-content'><ul><li>The podcast debunks the myth that the United States completely neglected the Indo-Pacific region after the Cold War or failed to foresee China's rise. While some administrations may have initially held idealistic views, there were voices within the US government that anticipated China becoming a significant rival, and actions like allowing Russia to maintain its atomic arsenal or the ambiguous bombing of the Chinese embassy in 1999 are presented as potential strategic moves or warnings.</li><li>The declared \"friendship without limits\" between China and Russia is identified as a strategic facade rather than a genuine, rigid alliance. The hosts and expert guest argue that underlying geopolitical rivalries, particularly in Central Asia, and China's efforts to avoid energy dependence on Russia indicate a relationship of transactional convenience rather than deep, unwavering alignment.</li><li>Regional countries in the Indo-Pacific, such as Vietnam, Brunei, Indonesia, Singapore, and Malaysia, are actively pursuing a strategy of \"hedging.\" This approach aims to maintain strategic autonomy by fostering relationships with both the United States and China across economic and military spheres, avoiding exclusive alignment with either superpower to prevent being subjected to their dominance.</li></ul></div>","references":"<div class='analysis-content'><ul><li>El fin de la historia y el último hombre</li><li>Game of Thrones</li></ul></div>","transcript":"2025-08-06-China_medium.txt"}}
+        // Tab switching logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active button
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+
+                // Update active tab content
+                const targetId = e.target.getAttribute('data-target');
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
 
         // Populate graph list
         function populateGraphList() {
@@ -395,6 +528,39 @@
 
             document.getElementById('graph-viewer').appendChild(iframe);
             currentGraph = index;
+
+            // Load textual insights
+            const graphAnalysis = analysisDataCache[graph.file];
+
+            if (graphAnalysis) {
+                document.getElementById('insights-panel').classList.remove('hidden');
+                
+                document.getElementById('tab-summary').innerHTML = graphAnalysis.summary || '<div class="analysis-content"><p>No summary available.</p></div>';
+                
+                const highlightsObj = graphAnalysis.highlights || '';
+                document.getElementById('tab-highlights').innerHTML = highlightsObj || '<div class="analysis-content"><p>No highlights available.</p></div>';
+                
+                const refObj = graphAnalysis.references || '';
+                const refTab = document.getElementById('tab-references');
+                const btnRef = document.getElementById('btn-references');
+                
+                // If there are no references (empty or just tags with no content like <ul></ul>)
+                if (!refObj || refObj.trim() === '' || refObj.includes('<ul></ul>') || refObj === "<div class='analysis-content'></div>") {
+                    btnRef.classList.add('hidden');
+                    refTab.innerHTML = '';
+                    // if reference tab was active, switch to summary
+                    if (btnRef.classList.contains('active')) {
+                        btnRef.classList.remove('active');
+                        document.querySelector('.tab-btn[data-target="tab-summary"]').click();
+                    }
+                } else {
+                    btnRef.classList.remove('hidden');
+                    refTab.innerHTML = refObj;
+                }
+            } else {
+                document.getElementById('insights-panel').classList.add('hidden');
+            }
+
         }
 
         // Initialize
