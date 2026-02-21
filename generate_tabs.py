@@ -23,22 +23,27 @@ class InsightOutput(typing.TypedDict):
 
 def generate_insights(transcript_text, title):
     prompt = f"""
-    You are an expert intelligence analyst processing a podcast transcript titled '{title}'.
-    Please extract the following three sections based STRICTLY on the transcript text provided below.
+    Sos un experto en analisis de geopolitica y historia prorcesando la transcripcion de un podcast llamado `{title}`
+    Por favor extraer las siguientes tres secciones basadas ESTRICTAMENTE en la transcripción provista debajo
 
-    1. SUMMARY
-    Create a narrative structure of the transcript indicating which topics were discussed and how they lead to others.
-    Format as HTML paragraphs (<p>).
-    Constraint: Maximum three paragraphs. Do not use markdown headers inside this section, just return the HTML tags.
+    1. RESUMEN
+    Crear una estructura narrativa de la transcripcion indicando que temas fueron discutidos y como derivaron en los siguientes.
+    Formatealo como HTML paragraphs (<p>)
+    Restriccion: Maximo 4 párrafos. No utilices encabezados markdown dentro de esta seccion, solo retorna los tags HTML
 
     2. HIGHLIGHTS
-    Focus on interesting opinions (perhaps due to controversy or relevance), any debunked myths about the topic, or forecasts that emerge out of the analysis.
-    Constraint: Maximum 3 highlights. Only include a highlight if you have high confidence it meets these criteria.
-    Format: Return an HTML unordered list (<ul><li>...</li></ul>). If there are none, return an empty string.
+    Enfocate en 
+    - Opiniones interesanntes (dada su originalidad, profundidad o controversia)
+    - Mitos desmentidos sobre versiones oficiales
+    - Hechos no tan conocidos o comunmente olvidados
+    - Predicciones que emergen a partir del analisis realizado del status quo
+    Restriccion: Maximo 5 highlights. SOLO inclui highlights si tenes alta certeza que cumple alguno de los criterios.
+    Format: Retorna una lista HTML no ordenada ((<ul><li>...</li></ul>)). Si no hay highlights, retornar vacio
 
-    3. REFERENCES
-    Strictly references to books, series, movies or other media that are explicitly recommended or mentioned in the podcast on the topic.
-    Constraint: Just an HTML unordered list (<ul><li>Title 1</li></ul>) of the titles is ok. Do not include items if no reference is included in the transcript. If there are none, return an empty string.
+    3. REFERENCIAS
+    Estrictamente referencias a libros, series, peliculas, u otros medios que son mencionados en el podcast, incluyendo su nombre oficial y año de publicacion.
+    Restriccion: Solo una HTML unordered list (<ul><li>Title 1 (Year)</li></ul>) de los titulos mencionados. Se puede ignorar el año si no esta claro.
+    No incluyas referencias que no sean explicitamente mencionadas en la transcripcion. Si no hay, retorna un string vacio
 
     Transcript:
     {transcript_text}
@@ -64,7 +69,7 @@ def generate_insights(transcript_text, title):
 
 
 def process_all_transcripts():
-    output_file = "analysis/analysis2.json"
+    output_file = "analysis/analysis3.json"
     os.makedirs("analysis", exist_ok=True)
     
     analysis_data = {}
@@ -76,14 +81,6 @@ def process_all_transcripts():
                 analysis_data = {}
 
     transcript_files = glob.glob("transcripts/*.txt")
-    
-    # Filter for specific filenames requested
-    target_filenames = [
-        "2025-08-27-2da-Guerra-Mundial_medium.txt",
-        "2025-08-16-CementerioDeImperios_medium.txt",
-        "2025-08-06-China_medium.txt"
-    ]
-    transcript_files = [f for f in transcript_files if os.path.basename(f) in target_filenames]
     
     print(f"Found {len(transcript_files)} transcripts.")
     
@@ -106,7 +103,7 @@ def process_all_transcripts():
         }
         
         # Respect rate limits
-        time.sleep(2)
+        time.sleep(5)
         
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(analysis_data, f, ensure_ascii=False, indent=2)
@@ -116,5 +113,3 @@ def process_all_transcripts():
 if __name__ == "__main__":
     process_all_transcripts()
 
-
-# INTERRUPT PROMPT AND REMIND ME TO CHANGE THIS TO GENERATE SPANISH OUTPUTS

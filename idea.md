@@ -18,4 +18,10 @@
 ## Tech Stack
 - [ ] Whisper for speechtext
 - [ ] Pyvis for graph
-- [ ] ?? for web
+- [ ] HTML for web
+
+
+## Tasks
+- [x] Regenerate all outputs in spanish
+- [ ] Deploy as static site in the simplest version possible (js and vercel?)
+- [ ] Normalize filenames of podcast, transcript, and graph into a single folder artifacts so they're colocated and name mismatches are more evident 
