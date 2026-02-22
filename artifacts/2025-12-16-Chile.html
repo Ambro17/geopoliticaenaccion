@@ -1,0 +1,208 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 800px;
+                 background-color: #1a1a1a;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Estados Unidos", "label": "Estados Unidos", "shape": "dot", "title": "Estados Unidos", "transcripts": "", "value": 42}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Chile", "label": "Chile", "shape": "dot", "title": "Chile", "transcripts": "", "value": 28}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Argentina", "label": "Argentina", "shape": "dot", "title": "Argentina", "transcripts": "", "value": 27}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Brasil", "label": "Brasil", "shape": "dot", "title": "Brasil", "transcripts": "", "value": 24}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "China", "label": "China", "shape": "dot", "title": "China", "transcripts": "", "value": 24}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Gran Breta\u00f1a", "label": "Gran Breta\u00f1a", "shape": "dot", "title": "Gran Breta\u00f1a", "transcripts": "", "value": 16}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Trump", "label": "Trump", "shape": "dot", "title": "Trump", "transcripts": "", "value": 10}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Am\u00e9rica", "label": "Am\u00e9rica", "shape": "dot", "title": "Am\u00e9rica", "transcripts": "", "value": 8}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Europa", "label": "Europa", "shape": "dot", "title": "Europa", "transcripts": "", "value": 7}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Atl\u00e1ntico", "label": "Atl\u00e1ntico", "shape": "dot", "title": "Atl\u00e1ntico", "transcripts": "", "value": 6}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Macri", "label": "Macri", "shape": "dot", "title": "Macri", "transcripts": "", "value": 6}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Pac\u00edfico", "label": "Pac\u00edfico", "shape": "dot", "title": "Pac\u00edfico", "transcripts": "", "value": 5}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Atl\u00e1ntico Sur", "label": "Atl\u00e1ntico Sur", "shape": "dot", "title": "Atl\u00e1ntico Sur", "transcripts": "", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Uni\u00f3n Sovi\u00e9tica", "label": "Uni\u00f3n Sovi\u00e9tica", "shape": "dot", "title": "Uni\u00f3n Sovi\u00e9tica", "transcripts": "", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Venezuela", "label": "Venezuela", "shape": "dot", "title": "Venezuela", "transcripts": "", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Pac\u00edfico Sur", "label": "Pac\u00edfico Sur", "shape": "dot", "title": "Pac\u00edfico Sur", "transcripts": "", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Confederaci\u00f3n", "label": "Confederaci\u00f3n", "shape": "dot", "title": "Confederaci\u00f3n", "transcripts": "", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Monroe", "label": "Monroe", "shape": "dot", "title": "Monroe", "transcripts": "", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Bolsonaro", "label": "Bolsonaro", "shape": "dot", "title": "Bolsonaro", "transcripts": "", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Espa\u00f1a", "label": "Espa\u00f1a", "shape": "dot", "title": "Espa\u00f1a", "transcripts": "", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "San Mart\u00edn", "label": "San Mart\u00edn", "shape": "dot", "title": "San Mart\u00edn", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Uruguay", "label": "Uruguay", "shape": "dot", "title": "Uruguay", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Groenlandia", "label": "Groenlandia", "shape": "dot", "title": "Groenlandia", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Canad\u00e1", "label": "Canad\u00e1", "shape": "dot", "title": "Canad\u00e1", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "\u00c1rtico", "label": "\u00c1rtico", "shape": "dot", "title": "\u00c1rtico", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Inglaterra", "label": "Inglaterra", "shape": "dot", "title": "Inglaterra", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Rusia", "label": "Rusia", "shape": "dot", "title": "Rusia", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Mercosur", "label": "Mercosur", "shape": "dot", "title": "Mercosur", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Milei", "label": "Milei", "shape": "dot", "title": "Milei", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Mendoza", "label": "Mendoza", "shape": "dot", "title": "Mendoza", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Washington", "label": "Washington", "shape": "dot", "title": "Washington", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Ant\u00e1rtico", "label": "Ant\u00e1rtico", "shape": "dot", "title": "Ant\u00e1rtico", "transcripts": "", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Saturnino Funes", "label": "Saturnino Funes", "shape": "dot", "title": "Saturnino Funes", "transcripts": "", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Saturn", "label": "Saturn", "shape": "dot", "title": "Saturn", "transcripts": "", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Mauro?", "label": "Mauro?", "shape": "dot", "title": "Mauro?", "transcripts": "", "value": 1}]);
+                  edges = new vis.DataSet([{"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "\u00c1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Trump", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Am\u00e9rica", "value": 4}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Groenlandia", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Macri", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Canad\u00e1", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Gran Breta\u00f1a", "value": 3}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Chile", "value": 4}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Argentina", "value": 8}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Brasil", "value": 3}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "China", "value": 6}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Rusia", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Europa", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Venezuela", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Milei", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Bolsonaro", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Argentina", "value": 13}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Atl\u00e1ntico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Gran Breta\u00f1a", "value": 5}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Pac\u00edfico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "San Mart\u00edn", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Uruguay", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Macri", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Trump", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Inglaterra", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Pac\u00edfico Sur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Am\u00e9rica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "Mendoza", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Chile", "to": "China", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Atl\u00e1ntico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Gran Breta\u00f1a", "value": 5}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Pac\u00edfico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "San Mart\u00edn", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Brasil", "value": 3}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Uruguay", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Am\u00e9rica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "China", "value": 3}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Europa", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Argentina", "to": "Ant\u00e1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "Bolsonaro", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "China", "value": 8}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "Mercosur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "Europa", "value": 3}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "Gran Breta\u00f1a", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "Venezuela", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "Pac\u00edfico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Brasil", "to": "Atl\u00e1ntico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Bolsonaro", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Mercosur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Europa", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Espa\u00f1a", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Inglaterra", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Gran Breta\u00f1a", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Gran Breta\u00f1a", "to": "Atl\u00e1ntico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Gran Breta\u00f1a", "to": "Pac\u00edfico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Gran Breta\u00f1a", "to": "Atl\u00e1ntico Sur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Gran Breta\u00f1a", "to": "Am\u00e9rica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Gran Breta\u00f1a", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Gran Breta\u00f1a", "to": "Europa", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Trump", "to": "Macri", "value": 3}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Trump", "to": "\u00c1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Trump", "to": "Am\u00e9rica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Trump", "to": "Groenlandia", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Trump", "to": "Canad\u00e1", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Trump", "to": "Europa", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Trump", "to": "Monroe", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Am\u00e9rica", "to": "\u00c1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Am\u00e9rica", "to": "Groenlandia", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Am\u00e9rica", "to": "Macri", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Am\u00e9rica", "to": "Canad\u00e1", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Europa", "to": "Rusia", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Europa", "to": "Venezuela", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Atl\u00e1ntico", "to": "Pac\u00edfico Sur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Atl\u00e1ntico", "to": "Saturnino Funes", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Atl\u00e1ntico", "to": "Pac\u00edfico", "value": 4}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Macri", "to": "\u00c1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Macri", "to": "Groenlandia", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Macri", "to": "Canad\u00e1", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Macri", "to": "Atl\u00e1ntico Sur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Macri", "to": "Pac\u00edfico Sur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Atl\u00e1ntico Sur", "to": "Pac\u00edfico Sur", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Pac\u00edfico Sur", "to": "Saturnino Funes", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Pac\u00edfico Sur", "to": "Inglaterra", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Confederaci\u00f3n", "to": "Uruguay", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Espa\u00f1a", "to": "Inglaterra", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "San Mart\u00edn", "to": "Washington", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Groenlandia", "to": "\u00c1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Groenlandia", "to": "Canad\u00e1", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Canad\u00e1", "to": "\u00c1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "\u00c1rtico", "to": "Ant\u00e1rtico", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Saturn", "to": "Mauro?", "value": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"physics": {"enabled": false}, "interaction": {"hover": false, "navigationButtons": true, "multiselect": true}, "nodes": {"scaling": {"min": 10, "max": 50}}, "edges": {"smooth": {"type": "continuous", "forceDirection": "none"}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+<div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+    <button id="physics-toggle" style="
+        background: rgba(245, 166, 35, 0.9);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    " onclick="togglePhysics()">
+        Physics: <span id="physics-status">OFF</span>
+    </button>
+</div>
+
+<script type="text/javascript">
+    let physicsEnabled = false;
+    
+    function togglePhysics() {
+        physicsEnabled = !physicsEnabled;
+        network.setOptions({ physics: { enabled: physicsEnabled } });
+        document.getElementById('physics-status').innerText = physicsEnabled ? 'ON' : 'OFF';
+        document.getElementById('physics-toggle').style.background = physicsEnabled ? 
+            'rgba(74, 144, 226, 0.9)' : 'rgba(245, 166, 35, 0.9)';
+    }
+    
+    network.on("click", function (params) {
+        var panel = document.getElementById('node-info-panel');
+        if (params.nodes.length > 0) {
+            var nodeId = params.nodes[0];
+            var nodeData = nodes.get(nodeId);
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            // Highlight neighbors logic
+            var connectedNodes = network.getConnectedNodes(nodeId);
+            var allNodes = nodes.get();
+            var nodesToUpdate = [];
+            
+            allNodes.forEach(function(node) {
+                if (node.id === nodeId) {
+                    node.color = { background: '#f5a623', border: '#d35400' };
+                    node.label = node.id; // Show label for selected node
+                } else if (connectedNodes.includes(node.id)) {
+                    node.color = { background: '#5dade2', border: '#2c3e50' };
+                    node.label = node.id; // Show label for neighbors
+                } else {
+                    node.color = { background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' };
+                    node.label = node.id; // Keep hidden for global, restore for regular
+                }
+                nodesToUpdate.push(node);
+            });
+            nodes.update(nodesToUpdate);
+            
+        } else {
+            
+            // Reset colors and hide labels
+            var allNodes = nodes.get();
+            var nodesToUpdate = [];
+            allNodes.forEach(function(node) {
+                node.color = { background: '#4a90e2', border: '#2c3e50' };
+                node.label = node.id;
+                nodesToUpdate.push(node);
+            });
+            nodes.update(nodesToUpdate);
+        }
+    });
+</script>
+</body>
+</html>

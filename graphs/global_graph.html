@@ -203,7 +203,7 @@
 <div id="node-info-panel">
     <span class="close-panel" onclick="document.getElementById('node-info-panel').style.display='none'">×</span>
     <h3 id="panel-node-name">NODE_IDENTIFIER</h3>
-    <div class="data-label">STRATEGIC_SOURCE_MAPPING:</div>
+    <div class="data-label">Mencionado en:</div>
     <div id="panel-transcripts" class="transcript-list"></div>
 </div>
 
@@ -227,10 +227,27 @@
             // Update panel for global graphs
             document.getElementById('panel-node-name').innerText = nodeId;
             
-            // Format transcripts as a list
+            // Podcast links mapping
+            var podcastLinks = {
+                '2Da Guerra Mundial': 'https://open.spotify.com/episode/6piSkenUwptag4EPRWFhsK?si=5657d5b2bbb040a0',
+                'Cementerio De Imperios': 'https://open.spotify.com/episode/49tSr9ktzubhP5vkWI9W6M?si=b3bb08c3a7ee4f7c',
+                'Chile': 'https://open.spotify.com/episode/6eSp0yNgJrfPswoaHkDtoF?si=e2b4e5a6e85e481a',
+                'China': 'https://open.spotify.com/episode/5rLShslMsHiNlsLOVAGuFe?si=0e532ca5d5a745a3',
+                'Malvinas': 'https://open.spotify.com/episode/7FfjFupRwnBGzyglzmoJxv?si=e43d4a60254f4613',
+                'Medio Oriente': 'https://open.spotify.com/episode/0P232aINnmqJ82Tgy2ZJNM?si=154af9fde3994449',
+                'Venezuela': 'https://youtu.be/UKKF1_6Pcuo'
+            };
+
+            // Format transcripts as linked list
             var transcriptList = nodeData.transcripts || '';
             var transcripts = transcriptList.split(', ');
-            var formattedTranscripts = transcripts.map(t => '<span class="transcript-bullet">•</span>' + t).join('<br>');
+            var formattedTranscripts = transcripts.map(function(t) {
+                var link = podcastLinks[t];
+                if (link) {
+                    return '<span class="transcript-bullet">•</span><a href="' + link + '" target="_blank" style="color: #94a3b8; text-decoration: none; border-bottom: 1px dotted #33C1FF;">' + t + '</a>';
+                }
+                return '<span class="transcript-bullet">•</span>' + t;
+            }).join('<br>');
             document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || 'N/A';
             
             panel.style.display = 'block';

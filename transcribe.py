@@ -113,7 +113,7 @@ def transcribe_audio(audio_path, model_size="tiny", device="cpu", language="es",
 
     if output_path is None:
         filename = audio_path.stem
-        output_path = Path(f"./transcripts/{filename}_{model_size}.txt")
+        output_path = Path(f"./artifacts/{filename}.txt")
     else:
         output_path = Path(output_path)
         

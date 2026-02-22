@@ -85,18 +85,32 @@ def extract_entities_from_text(text):
 
     return entities, doc
 
-def build_global_graph(transcript_dir="transcripts"):
+# Hardcoded mapping from transcript filename to display name
+# (get_friendly_name derives names like "Cementerio De Imperios" from filenames,
+# but we want the names to match the sidebar in index.html)
+TRANSCRIPT_FRIENDLY_NAMES = {
+    "2025-07-13-Malvinas.txt": "Malvinas",
+    "2025-08-06-China.txt": "China",
+    "2025-08-16-CementerioDeImperios.txt": "Primera Guerra Mundial",
+    "2025-08-27-2da-Guerra-Mundial.txt": "Segunda Guerra Mundial",
+    "2025-10-4-Medio-Oriente.txt": "Medio Oriente",
+    "2025-12-16-Chile.txt": "Chile",
+    "2026-01-11-Venezuela.txt": "Venezuela",
+}
+
+
+def build_global_graph(transcript_dir="artifacts"):
     all_files = glob.glob(os.path.join(transcript_dir, "*.txt"))
-    
+
     global_entity_counts = Counter()
     entity_to_transcripts = {} # entity -> set of filenames
-    
+
     # We'll store (src, dst, transcript) for edges
     all_edges_with_source = []
 
     for file_path in all_files:
         base_name = os.path.basename(file_path)
-        friendly_name = get_friendly_name(base_name)
+        friendly_name = TRANSCRIPT_FRIENDLY_NAMES.get(base_name, get_friendly_name(base_name))
         print(f"Processing {friendly_name} ({base_name})...")
         
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -156,8 +170,8 @@ def build_global_graph(transcript_dir="transcripts"):
     
     return G
 
-def visualize_global_graph(G, output_file="graphs/global_graph.html"):
-    os.makedirs("graphs", exist_ok=True)
+def visualize_global_graph(G, output_file="artifacts/global_graph.html"):
+    os.makedirs("artifacts", exist_ok=True)
     
     # Height/width and dark theme
     net = Network(height="800px", width="100%", bgcolor="#1a1a1a", font_color="white", notebook=False)
@@ -305,7 +319,7 @@ def visualize_global_graph(G, output_file="graphs/global_graph.html"):
 <div id="node-info-panel">
     <span class="close-panel" onclick="document.getElementById('node-info-panel').style.display='none'">×</span>
     <h3 id="panel-node-name">NODE_IDENTIFIER</h3>
-    <div class="data-label">STRATEGIC_SOURCE_MAPPING:</div>
+    <div class="data-label">Mencionado en:</div>
     <div id="panel-transcripts" class="transcript-list"></div>
 </div>
 """
@@ -317,22 +331,22 @@ def visualize_global_graph(G, output_file="graphs/global_graph.html"):
         if (params.nodes.length > 0) {
             var nodeId = params.nodes[0];
             var nodeData = nodes.get(nodeId);
-            
+
             document.getElementById('panel-node-name').innerText = nodeId;
-            
+
             // Format transcripts as a list
             var transcriptList = nodeData.transcripts || "";
             var transcripts = transcriptList.split(', ');
-            var formattedTranscripts = transcripts.map(t => '<span class="transcript-bullet">•</span>' + t).join('<br>');
+            var formattedTranscripts = transcripts.map(t => '<span class="transcript-bullet">&bull;</span>' + t).join('<br>');
             document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || "N/A";
-            
+
             panel.style.display = 'block';
-            
+
             // Highlight neighbors logic
             var connectedNodes = network.getConnectedNodes(nodeId);
             var allNodes = nodes.get();
             var nodesToUpdate = [];
-            
+
             allNodes.forEach(function(node) {
                 if (node.id === nodeId) {
                     node.color = { background: '#f5a623', border: '#d35400' };
@@ -347,7 +361,7 @@ def visualize_global_graph(G, output_file="graphs/global_graph.html"):
                 nodesToUpdate.push(node);
             });
             nodes.update(nodesToUpdate);
-            
+
         } else {
             panel.style.display = 'none';
             // Reset colors and hide labels

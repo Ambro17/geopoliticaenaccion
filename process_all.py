@@ -4,29 +4,24 @@ from transcribe import transcribe_audio
 from build_graph import build_semantic_graph, visualize_graph_pyvis
 
 def process_podcasts():
-    podcast_dir = Path("podcasts")
-    transcript_dir = Path("transcripts")
-    graph_dir = Path("graphs")
-    
-    os.makedirs(transcript_dir, exist_ok=True)
-    os.makedirs(graph_dir, exist_ok=True)
-    
-    podcasts = list(podcast_dir.glob("*.mp3"))
+    artifacts_dir = Path("artifacts")
+
+    os.makedirs(artifacts_dir, exist_ok=True)
+
+    podcasts = list(artifacts_dir.glob("*.mp3"))
     print(f"Found {len(podcasts)} podcasts.")
-    
+
     for podcast_path in podcasts:
         print(f"\nProcessing: {podcast_path.name}")
         base_name = podcast_path.stem
-        
+
         # 1. Look for existing transcript
-        transcripts = list(transcript_dir.glob(f"{base_name}*.txt"))
-        
-        if not transcripts:
+        transcript_path = artifacts_dir / f"{base_name}.txt"
+
+        if not transcript_path.exists():
             print(f"No transcript found for {base_name}. Skipping.")
             continue
         else:
-            # Prefer transcripts without _tiny if multiple exist, or just take first
-            transcript_path = transcripts[0]
             print(f"Using existing transcript: {transcript_path.name}")
             
         if transcript_path and transcript_path.exists():

@@ -16,12 +16,12 @@
 - [ ] LLM Chat Interface to query knowledge graphs, get recommended podcasts
 
 ## Tech Stack
-- [ ] Whisper for speechtext
-- [ ] Pyvis for graph
-- [ ] HTML for web
-
+- [x] Whisper for speechtext
+- [x] Pyvis for graph
+- [x] HTML for web
+- [x] Github Pages for hosting
 
 ## Tasks
 - [x] Regenerate all outputs in spanish
-- [ ] Deploy as static site in the simplest version possible (js and vercel?)
-- [ ] Normalize filenames of podcast, transcript, and graph into a single folder artifacts so they're colocated and name mismatches are more evident 
+- [x] Deploy as static site in the simplest version possible (js and vercel?)
+- [x] Normalize filenames of podcast, transcript, and graph into a single folder artifacts so they're colocated and name mismatches are more evident 

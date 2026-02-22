@@ -9,7 +9,7 @@ from pathlib import Path
 from build_graph import build_semantic_graph
 import shutil
 
-TRANSCRIPTS_DIR = Path("transcripts")
+TRANSCRIPTS_DIR = Path("artifacts")
 OUTPUT_DIR = Path("static_site")
 GRAPHS_OUTPUT = OUTPUT_DIR / "graphs"
 

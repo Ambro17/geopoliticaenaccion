@@ -85,18 +85,30 @@ def extract_entities_from_text(text):
 
     return entities, doc
 
-def build_global_graph(transcript_dir="transcripts"):
+# Hardcoded mapping from transcript filename to display name
+TRANSCRIPT_FRIENDLY_NAMES = {
+    "2025-07-13-Malvinas.txt": "Malvinas",
+    "2025-08-06-China.txt": "China",
+    "2025-08-16-CementerioDeImperios.txt": "Primera Guerra Mundial",
+    "2025-08-27-2da-Guerra-Mundial.txt": "Segunda Guerra Mundial",
+    "2025-10-4-Medio-Oriente.txt": "Medio Oriente",
+    "2025-12-16-Chile.txt": "Chile",
+    "2026-01-11-Venezuela.txt": "Venezuela",
+}
+
+
+def build_global_graph(transcript_dir="artifacts"):
     all_files = glob.glob(os.path.join(transcript_dir, "*.txt"))
-    
+
     global_entity_counts = Counter()
     entity_to_transcripts = {} # entity -> set of filenames
-    
+
     # We'll store (src, dst, transcript) for edges
     all_edges_with_source = []
 
     for file_path in all_files:
         base_name = os.path.basename(file_path)
-        friendly_name = get_friendly_name(base_name)
+        friendly_name = TRANSCRIPT_FRIENDLY_NAMES.get(base_name, get_friendly_name(base_name))
         print(f"Processing {friendly_name} ({base_name})...")
         
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -280,7 +292,7 @@ def get_physics_options(enabled=True):
 
 def visualize_graph(G, output_file, is_global=False):
     """Generates an interactive graph using pyvis with configurable physics."""
-    os.makedirs("graphs", exist_ok=True)
+    os.makedirs("artifacts", exist_ok=True)
     
     # Height/width and dark theme
     net = Network(height="800px", width="100%", bgcolor="#1a1a1a", font_color="white", notebook=False)
@@ -441,7 +453,7 @@ def visualize_graph(G, output_file, is_global=False):
 <div id="node-info-panel">
     <span class="close-panel" onclick="document.getElementById('node-info-panel').style.display='none'">×</span>
     <h3 id="panel-node-name">NODE_IDENTIFIER</h3>
-    <div class="data-label">STRATEGIC_SOURCE_MAPPING:</div>
+    <div class="data-label">Mencionado en:</div>
     <div id="panel-transcripts" class="transcript-list"></div>
 </div>
 """
@@ -451,37 +463,37 @@ def visualize_graph(G, output_file, is_global=False):
     script_injection = f"""
 <script type="text/javascript">
     let physicsEnabled = {str(physics_enabled).lower()};
-    
+
     function togglePhysics() {{
         physicsEnabled = !physicsEnabled;
         network.setOptions({{ physics: {{ enabled: physicsEnabled }} }});
         document.getElementById('physics-status').innerText = physicsEnabled ? 'ON' : 'OFF';
-        document.getElementById('physics-toggle').style.background = physicsEnabled ? 
+        document.getElementById('physics-toggle').style.background = physicsEnabled ?
             'rgba(74, 144, 226, 0.9)' : 'rgba(245, 166, 35, 0.9)';
     }}
-    
+
     network.on("click", function (params) {{
         var panel = document.getElementById('node-info-panel');
         if (params.nodes.length > 0) {{
             var nodeId = params.nodes[0];
             var nodeData = nodes.get(nodeId);
-            
+
             {"// Update panel for global graphs" if is_global else ""}
             {"document.getElementById('panel-node-name').innerText = nodeId;" if is_global else ""}
-            
+
             {"// Format transcripts as a list" if is_global else ""}
             {"var transcriptList = nodeData.transcripts || '';" if is_global else ""}
             {"var transcripts = transcriptList.split(', ');" if is_global else ""}
-            {"var formattedTranscripts = transcripts.map(t => '<span class=\"transcript-bullet\">•</span>' + t).join('<br>');" if is_global else ""}
+            {"var formattedTranscripts = transcripts.map(t => '<span class=\"transcript-bullet\">&bull;</span>' + t).join('<br>');" if is_global else ""}
             {"document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || 'N/A';" if is_global else ""}
-            
+
             {"panel.style.display = 'block';" if is_global else ""}
-            
+
             // Highlight neighbors logic
             var connectedNodes = network.getConnectedNodes(nodeId);
             var allNodes = nodes.get();
             var nodesToUpdate = [];
-            
+
             allNodes.forEach(function(node) {{
                 if (node.id === nodeId) {{
                     node.color = {{ background: '#f5a623', border: '#d35400' }};
@@ -496,7 +508,7 @@ def visualize_graph(G, output_file, is_global=False):
                 nodesToUpdate.push(node);
             }});
             nodes.update(nodesToUpdate);
-            
+
         }} else {{
             {"panel.style.display = 'none';" if is_global else ""}
             // Reset colors and hide labels
@@ -532,7 +544,7 @@ if __name__ == "__main__":
         print("Building global semantic graph...")
         G = build_global_graph()
         print(f"Global graph constructed with {len(G.nodes())} nodes and {len(G.edges())} edges.")
-        visualize_graph(G, "graphs/global_graph.html", is_global=True)
+        visualize_graph(G, "artifacts/global_graph.html", is_global=True)
     elif args.input:
         if not os.path.exists(args.input):
             print(f"{args.input} not found.")
@@ -541,7 +553,7 @@ if __name__ == "__main__":
             G = build_semantic_graph(args.input)
             print(f"Graph created with {len(G.nodes())} nodes and {len(G.edges())} edges.")
             base_name = os.path.splitext(os.path.basename(args.input))[0]
-            output_file = os.path.join("graphs", f"pyvis_{base_name}.html")
+            output_file = os.path.join("artifacts", f"{base_name}.html")
             visualize_graph(G, output_file, is_global=False)
     else:
         print("Please specify either --global-graph or --input <file>")

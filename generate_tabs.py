@@ -69,7 +69,7 @@ def generate_insights(transcript_text, title):
 
 
 def process_all_transcripts():
-    output_file = "analysis/analysis3.json"
+    output_file = "analysis/analysis.json"
     os.makedirs("analysis", exist_ok=True)
     
     analysis_data = {}
@@ -80,13 +80,13 @@ def process_all_transcripts():
             except json.JSONDecodeError:
                 analysis_data = {}
 
-    transcript_files = glob.glob("transcripts/*.txt")
+    transcript_files = glob.glob("artifacts/*.txt")
     
     print(f"Found {len(transcript_files)} transcripts.")
     
     for filepath in transcript_files:
         filename = os.path.basename(filepath)
-        graph_key = f"pyvis_{filename.replace('.txt', '.html')}"
+        graph_key = filename.replace('.txt', '.html')
         
         print(f"Processing {filename}...")
         

@@ -172,9 +172,9 @@ def build_semantic_graph(file_path):
 def visualize_graph_pyvis(G, input_file):
     """Generates an interactive graph using pyvis with specific styling."""
     base_name = os.path.splitext(os.path.basename(input_file))[0]
-    output_file = os.path.join("graphs", f"pyvis_{base_name}.html")
-    
-    os.makedirs("graphs", exist_ok=True)
+    output_file = os.path.join("artifacts", f"{base_name}.html")
+
+    os.makedirs("artifacts", exist_ok=True)
     
     # Use dark background as requested
     net = Network(height="750px", width="100%", bgcolor="#222222", font_color="white", notebook=False)
