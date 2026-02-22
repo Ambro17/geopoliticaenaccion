@@ -1,5 +1,7 @@
 # GeoPolVis
-[Demo](https://ambro17.github.io/geopoliticaenaccion/)
+[🚀 Demo](https://ambro17.github.io/geopoliticaenaccion/)
+
+
 Transcribe geopolitical podcasts, extract semantic entities, and visualize them as interactive knowledge graphs.
 
 ## Project Structure
