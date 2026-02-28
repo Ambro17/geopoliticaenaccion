@@ -11,14 +11,14 @@ PODCAST_ARTIFACTS = {
         "podcast_link": "https://open.spotify.com/episode/7FfjFupRwnBGzyglzmoJxv?si=e43d4a60254f4613"
     },
     "Malvinas 23 Antecedentes": {
-        "friendly_name": "Malvinas (Agosto 2023)",
+        "friendly_name": "Malvinas (2023 I)",
         "mp3_path": "artifacts/2023-08-23-Malvinas.mp3",
         "transcript_path": "artifacts/2023-08-23-Malvinas.txt",
         "graph_path": "artifacts/2023-08-23-Malvinas.html",
         "podcast_link": "https://open.spotify.com/episode/4n8nRNmumEiZlLWnEn9uSP?si=xcVayY_DQsOhN7ld_ZwDyA"
     },
     "Malvinas 23 Conflicto": {
-        "friendly_name": "Malvinas (Septiembre 2023)",
+        "friendly_name": "Malvinas (2023 II)",
         "mp3_path": "artifacts/2023-09-01-Malvinas.mp3",
         "transcript_path": "artifacts/2023-09-01-Malvinas.txt",
         "graph_path": "artifacts/2023-09-01-Malvinas.html",

@@ -91,8 +91,8 @@ def extract_entities_from_text(text):
 # but we want the names to match the sidebar in index.html)
 TRANSCRIPT_FRIENDLY_NAMES = {
     "2025-07-13-Malvinas.txt": "Malvinas (2025)",
-    "2023-08-23-Malvinas.txt": "Malvinas (Agosto 2023)",
-    "2023-09-01-Malvinas.txt": "Malvinas (Septiembre 2023)",
+    "2023-08-23-Malvinas.txt": "Malvinas (2023 I)",
+    "2023-09-01-Malvinas.txt": "Malvinas (2023 II)",
     "2025-08-06-China.txt": "China",
     "2025-08-16-CementerioDeImperios.txt": "Primera Guerra Mundial",
     "2025-08-27-2da-Guerra-Mundial.txt": "Segunda Guerra Mundial",
