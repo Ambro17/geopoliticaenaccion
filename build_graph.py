@@ -215,23 +215,7 @@ def visualize_graph_pyvis(G, input_file):
     net.set_options("""
     var options = {
       "physics": {
-        "forceAtlas2Based": {
-          "gravitationalConstant": -300,
-          "centralGravity": 0.005,
-          "springLength": 250,
-          "springConstant": 0.08,
-          "damping": 0.5
-        },
-        "maxVelocity": 5,
-        "minVelocity": 0.1,
-        "solver": "forceAtlas2Based",
-        "timestep": 0.05,
-        "stabilization": { 
-          "enabled": true,
-          "iterations": 1000,
-          "updateInterval": 50
-        },
-        "enabled": true
+        "enabled": false
       },
       "interaction": {
         "hover": false,
@@ -262,7 +246,34 @@ def visualize_graph_pyvis(G, input_file):
     # Create a nice overlay style and script (Simplified for single graphs)
     custom_style = """
 </style>
+<div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+    <button id="physics-toggle" style="
+        background: rgba(245, 166, 35, 0.9);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    " onclick="togglePhysics()">
+        Physics: <span id="physics-status">OFF</span>
+    </button>
+</div>
 <script type="text/javascript">
+    let physicsEnabled = false;
+    
+    function togglePhysics() {
+        physicsEnabled = !physicsEnabled;
+        network.setOptions({ physics: { enabled: physicsEnabled } });
+        document.getElementById('physics-status').innerText = physicsEnabled ? 'ON' : 'OFF';
+        document.getElementById('physics-toggle').style.background = physicsEnabled ? 
+            'rgba(74, 144, 226, 0.9)' : 'rgba(245, 166, 35, 0.9)';
+    }
+
     network.on("click", function (params) {
         if (params.nodes.length > 0) {
             var nodeId = params.nodes[0];
@@ -275,10 +286,13 @@ def visualize_graph_pyvis(G, input_file):
             allNodes.forEach(function(node) {
                 if (node.id === nodeId) {
                     node.color = { background: '#f5a623', border: '#d35400' };
+                    node.label = node.id;
                 } else if (connectedNodes.includes(node.id)) {
                     node.color = { background: '#5dade2', border: '#2c3e50' };
+                    node.label = node.id;
                 } else {
                     node.color = { background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' };
+                    node.label = node.id;
                 }
                 nodesToUpdate.push(node);
             });
@@ -290,6 +304,7 @@ def visualize_graph_pyvis(G, input_file):
             var nodesToUpdate = [];
             allNodes.forEach(function(node) {
                 node.color = { background: '#4a90e2', border: '#2c3e50' };
+                node.label = node.id;
                 nodesToUpdate.push(node);
             });
             nodes.update(nodesToUpdate);

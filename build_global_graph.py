@@ -5,6 +5,7 @@ from collections import Counter
 import os
 import glob
 from pyvis.network import Network
+from podcast_artifacts import PODCAST_ARTIFACTS
 
 # Load Spanish model
 try:
@@ -89,7 +90,9 @@ def extract_entities_from_text(text):
 # (get_friendly_name derives names like "Cementerio De Imperios" from filenames,
 # but we want the names to match the sidebar in index.html)
 TRANSCRIPT_FRIENDLY_NAMES = {
-    "2025-07-13-Malvinas.txt": "Malvinas",
+    "2025-07-13-Malvinas.txt": "Malvinas (2025)",
+    "2023-08-23-Malvinas.txt": "Malvinas (Agosto 2023)",
+    "2023-09-01-Malvinas.txt": "Malvinas (Septiembre 2023)",
     "2025-08-06-China.txt": "China",
     "2025-08-16-CementerioDeImperios.txt": "Primera Guerra Mundial",
     "2025-08-27-2da-Guerra-Mundial.txt": "Segunda Guerra Mundial",
@@ -252,9 +255,12 @@ def visualize_global_graph(G, output_file="artifacts/global_graph.html"):
     
     net.write_html(output_file)
     
-    # Inject Custom Tooltip Logic
+    # Correct the lib path (it's relative to artifacts/ folder)
     with open(output_file, 'r') as f:
         html = f.read()
+    html = html.replace('src="lib/bindings/utils.js"', 'src="../lib/bindings/utils.js"')
+    
+    # Inject Custom Tooltip Logic
 
     # Create a nice overlay style and script
     custom_style = """
@@ -312,8 +318,14 @@ def visualize_global_graph(G, output_file="artifacts/global_graph.html"):
         color: #94a3b8;
         font-size: 20px;
     }
-    .close-panel:hover {
-        color: #d4af37;
+    .transcript-link {
+        color: #33C1FF;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .transcript-link:hover {
+        color: #f5a623;
+        text-decoration: underline;
     }
 </style>
 <div id="node-info-panel">
@@ -324,20 +336,37 @@ def visualize_global_graph(G, output_file="artifacts/global_graph.html"):
 </div>
 """
 
-    script_injection = """
+    script_injection = f"""
 <script type="text/javascript">
-    network.on("click", function (params) {
+    // Podcast data from Python mapping
+    const PODCAST_DATA = {repr(PODCAST_ARTIFACTS)};
+
+    function getPodcastByName(name) {{
+        for (const [key, podcast] of Object.entries(PODCAST_DATA)) {{
+            if (podcast.friendly_name === name) {{
+                return podcast;
+            }}
+        }}
+        return null;
+    }}
+
+    network.on("click", function (params) {{
         var panel = document.getElementById('node-info-panel');
-        if (params.nodes.length > 0) {
+        if (params.nodes.length > 0) {{
             var nodeId = params.nodes[0];
             var nodeData = nodes.get(nodeId);
 
             document.getElementById('panel-node-name').innerText = nodeId;
 
-            // Format transcripts as a list
+            // Format transcripts as a list with direct podcast links
             var transcriptList = nodeData.transcripts || "";
             var transcripts = transcriptList.split(', ');
-            var formattedTranscripts = transcripts.map(t => '<span class="transcript-bullet">&bull;</span>' + t).join('<br>');
+            var formattedTranscripts = transcripts.map(t => {{Modify "Mencionado En:" tooltip to render links to podcast based on podcast_artifacts.py mapping.
+                var podcast = getPodcastByName(t);
+                var link = podcast ? podcast.podcast_link : '#';
+                return '<span class="transcript-bullet">&bull;</span>' + 
+                '<a class="transcript-link" href="' + link + '" target="_blank" rel="noopener noreferrer">' + podcast.friendly_name + '</a>';
+            }}).join('<br>');
             document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || "N/A";
 
             panel.style.display = 'block';
@@ -347,34 +376,34 @@ def visualize_global_graph(G, output_file="artifacts/global_graph.html"):
             var allNodes = nodes.get();
             var nodesToUpdate = [];
 
-            allNodes.forEach(function(node) {
-                if (node.id === nodeId) {
-                    node.color = { background: '#f5a623', border: '#d35400' };
+            allNodes.forEach(function(node) {{
+                if (node.id === nodeId) {{
+                    node.color = {{ background: '#f5a623', border: '#d35400' }};
                     node.label = node.id; // Show label for selected node
-                } else if (connectedNodes.includes(node.id)) {
-                    node.color = { background: '#5dade2', border: '#2c3e50' };
+                }} else if (connectedNodes.includes(node.id)) {{
+                    node.color = {{ background: '#5dade2', border: '#2c3e50' }};
                     node.label = node.id; // Show label for neighbors
-                } else {
-                    node.color = { background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' };
+                }} else {{
+                    node.color = {{ background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' }};
                     node.label = " "; // Keep hidden
-                }
+                }}
                 nodesToUpdate.push(node);
-            });
+            }});
             nodes.update(nodesToUpdate);
 
-        } else {
+        }} else {{
             panel.style.display = 'none';
             // Reset colors and hide labels
             var allNodes = nodes.get();
             var nodesToUpdate = [];
-            allNodes.forEach(function(node) {
-                node.color = { background: '#4a90e2', border: '#2c3e50' };
+            allNodes.forEach(function(node) {{
+                node.color = {{ background: '#4a90e2', border: '#2c3e50' }};
                 node.label = " ";
                 nodesToUpdate.push(node);
-            });
+            }});
             nodes.update(nodesToUpdate);
-        }
-    });
+        }}
+    }});
 </script>
 """
     html = html.replace('</body>', custom_style + script_injection + '</body>')

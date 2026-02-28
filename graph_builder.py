@@ -87,7 +87,9 @@ def extract_entities_from_text(text):
 
 # Hardcoded mapping from transcript filename to display name
 TRANSCRIPT_FRIENDLY_NAMES = {
-    "2025-07-13-Malvinas.txt": "Malvinas",
+    "2025-07-13-Malvinas.txt": "Malvinas (2025)",
+    "2023-08-23-Malvinas.txt": "Malvinas (Agosto 2023)",
+    "2023-09-01-Malvinas.txt": "Malvinas (Septiembre 2023)",
     "2025-08-06-China.txt": "China",
     "2025-08-16-CementerioDeImperios.txt": "Primera Guerra Mundial",
     "2025-08-27-2da-Guerra-Mundial.txt": "Segunda Guerra Mundial",
@@ -306,24 +308,27 @@ def visualize_graph(G, output_file, is_global=False):
     
     for node, data in G.nodes(data=True):
         count = data.get('size', 1)
-        transcripts = data.get('transcripts', '')
+        {"transcripts = data.get('transcripts', '')" if is_global else ""}
         
         # For global graphs, hide labels by default, show for regular graphs
         label = " " if is_global else node
         
-        net.add_node(
-            node,
-            label=label,
-            title=node, # Native tooltip on hover
-            value=count,
-            transcripts=transcripts,
-            color={
+        # Build node parameters
+        node_params = {
+            "label": label,
+            "title": node, # Native tooltip on hover
+            "value": count,
+            "color": {
                 "background": default_color,
                 "border": "#2c3e50",
                 "highlight": {"background": highlight_color, "border": "#d35400"},
                 "hover": {"background": "#5dade2", "border": "#2c3e50"}
             }
-        )
+        }
+        
+        {"node_params['transcripts'] = transcripts" if is_global else ""}
+        
+        net.add_node(node, **node_params)
         
     for src, dst, data in G.edges(data=True):
         weight = data.get('weight', 1)
@@ -446,8 +451,14 @@ def visualize_graph(G, output_file, is_global=False):
         color: #94a3b8;
         font-size: 20px;
     }
-    .close-panel:hover {
-        color: #d4af37;
+    .transcript-link {
+        color: #33C1FF;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .transcript-link:hover {
+        color: #f5a623;
+        text-decoration: underline;
     }
 </style>
 <div id="node-info-panel">
@@ -473,18 +484,18 @@ def visualize_graph(G, output_file, is_global=False):
     }}
 
     network.on("click", function (params) {{
-        var panel = document.getElementById('node-info-panel');
+        {"var panel = document.getElementById('node-info-panel');" if is_global else ""}
         if (params.nodes.length > 0) {{
             var nodeId = params.nodes[0];
             var nodeData = nodes.get(nodeId);
 
-            {"// Update panel for global graphs" if is_global else ""}
+            {"            // Update panel for global graphs" if is_global else ""}
             {"document.getElementById('panel-node-name').innerText = nodeId;" if is_global else ""}
 
-            {"// Format transcripts as a list" if is_global else ""}
+            {"// Format transcripts as a list with links using postMessage for safety" if is_global else ""}
             {"var transcriptList = nodeData.transcripts || '';" if is_global else ""}
             {"var transcripts = transcriptList.split(', ');" if is_global else ""}
-            {"var formattedTranscripts = transcripts.map(t => '<span class=\"transcript-bullet\">&bull;</span>' + t).join('<br>');" if is_global else ""}
+            {"var formattedTranscripts = transcripts.map(t => '<span class=\"transcript-bullet\">&bull;</span>' + '<a class=\"transcript-link\" onclick=\"window.parent.postMessage({type: \\'loadReport\\', name: `' + t + '`}, \\'\\*\\')\">' + t + '</a>').join('<br>');" if is_global else ""}
             {"document.getElementById('panel-transcripts').innerHTML = formattedTranscripts || 'N/A';" if is_global else ""}
 
             {"panel.style.display = 'block';" if is_global else ""}
@@ -524,6 +535,9 @@ def visualize_graph(G, output_file, is_global=False):
     }});
 </script>
 """
+
+    # Correct the lib path (it's relative to artifacts/ folder)
+    html = html.replace('src="lib/bindings/utils.js"', 'src="../lib/bindings/utils.js"')
 
     html = html.replace('</body>', toggle_button + custom_style + script_injection + '</body>')
     

@@ -104,10 +104,10 @@ python process_all.py
 ## Adding a New Episode
 
 1. Place the MP3 in `artifacts/` with the naming convention `YYYY-MM-DD-Name.mp3`
-2. Transcribe: `python transcribe.py artifacts/YYYY-MM-DD-Name.mp3`
-3. Build graph: `python build_graph.py artifacts/YYYY-MM-DD-Name.txt`
-4. Rebuild global graph: `python build_global_graph.py`
-5. Generate analysis: `python generate_tabs.py`
+2. Transcribe: `uv run python transcribe.py artifacts/YYYY-MM-DD-Name.mp3`
+3. Build graph: `uv run python build_graph.py artifacts/YYYY-MM-DD-Name.txt`
+4. Rebuild global graph: `uv run python build_global_graph.py`
+5. Generate analysis: `uv run python generate_tabs.py`
 6. Add the entry to `podcast_artifacts.py` and update the `graphs` array + `analysisDataCache` in `index.html`
 
 ## Dependencies

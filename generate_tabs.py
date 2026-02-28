@@ -84,6 +84,7 @@ def process_all_transcripts():
     
     print(f"Found {len(transcript_files)} transcripts.")
     
+    transcript_files = [x for x in transcript_files if '2023-08-23-Malvinas' in x or '2023-09-01-Malvinas' in x]
     for filepath in transcript_files:
         filename = os.path.basename(filepath)
         graph_key = filename.replace('.txt', '.html')
