@@ -364,9 +364,59 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .mobile-overlay-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: var(--accent-gold);
+        }
+
+        .mobile-overlay-text {
+            font-size: 20px;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .mobile-overlay-subtext {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                display: none !important;
+            }
+            .mobile-overlay {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="mobile-overlay">
+        <div class="mobile-overlay-icon">🖥️</div>
+        <div class="mobile-overlay-text">Resolución no soportada</div>
+        <div class="mobile-overlay-subtext">Para una mejor experiencia y visualización de los grafos, por favor abrilo desde una computadora de escritorio.</div>
+    </div>
     <div class="container">
         <div class="sidebar">
             <h1>GEOPOL-INT</h1>
