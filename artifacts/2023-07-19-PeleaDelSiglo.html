@@ -1,0 +1,194 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "China", "label": "China", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 64}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Estados Unidos", "label": "Estados Unidos", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 52}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Europa", "label": "Europa", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 8}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Taiw\u00e1n", "label": "Taiw\u00e1n", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 5}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Guerra Fr\u00eda", "label": "Guerra Fr\u00eda", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Rusia", "label": "Rusia", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Mart\u00edn", "label": "Mart\u00edn", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Obama", "label": "Obama", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Vietnam", "label": "Vietnam", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 4}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Nixon", "label": "Nixon", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Uni\u00f3n Sovi\u00e9tica", "label": "Uni\u00f3n Sovi\u00e9tica", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Jap\u00f3n", "label": "Jap\u00f3n", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 3}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Segunda Guerra Mundial", "label": "Segunda Guerra Mundial", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Shanghai", "label": "Shanghai", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Uni\u00f3n Europea", "label": "Uni\u00f3n Europea", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Putin", "label": "Putin", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Filipinas", "label": "Filipinas", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 2}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Martin Bilik", "label": "Martin Bilik", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Mauro Labombarda", "label": "Mauro Labombarda", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Hola Martin", "label": "Hola Martin", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Asia", "label": "Asia", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Egipto", "label": "Egipto", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Exacto Mart\u00edn", "label": "Exacto Mart\u00edn", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 1}, {"color": {"background": "#4a90e2", "border": "#2c3e50", "highlight": {"background": "#f5a623", "border": "#d35400"}, "hover": {"background": "#5dade2", "border": "#2c3e50"}}, "font": {"color": "white"}, "id": "Kosovo", "label": "Kosovo", "shape": "dot", "transcripts": "Artifacts/2023 07 19 Pelea Del Siglo", "value": 1}]);
+                  edges = new vis.DataSet([{"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Estados Unidos", "value": 19}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Hola Martin", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Taiw\u00e1n", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Shanghai", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Guerra Fr\u00eda", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Rusia", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Putin", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Obama", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "China", "to": "Europa", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Hola Martin", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Rusia", "value": 3}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Exacto Mart\u00edn", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Europa", "value": 5}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Uni\u00f3n Sovi\u00e9tica", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Taiw\u00e1n", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Guerra Fr\u00eda", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Uni\u00f3n Europea", "value": 2}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Kosovo", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Putin", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Obama", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Estados Unidos", "to": "Vietnam", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Europa", "to": "Asia", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Europa", "to": "Egipto", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Europa", "to": "Exacto Mart\u00edn", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Europa", "to": "Obama", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Guerra Fr\u00eda", "to": "Segunda Guerra Mundial", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Rusia", "to": "Putin", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Mart\u00edn", "to": "Nixon", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Vietnam", "to": "Filipinas", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Jap\u00f3n", "to": "Filipinas", "value": 1}, {"color": {"color": "rgba(200, 200, 200, 0.1)", "highlight": "#f5a623", "opacity": 0.2}, "from": "Martin Bilik", "to": "Mauro Labombarda", "value": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"physics": {"enabled": false}, "interaction": {"hover": false, "navigationButtons": true, "multiselect": true}, "nodes": {"scaling": {"min": 10, "max": 50}}, "edges": {"smooth": {"type": "continuous", "forceDirection": "none"}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+</style>
+<div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+    <button id="physics-toggle" style="
+        background: rgba(245, 166, 35, 0.9);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    " onclick="togglePhysics()">
+        Physics: <span id="physics-status">OFF</span>
+    </button>
+</div>
+<script type="text/javascript">
+    let physicsEnabled = false;
+    
+    function togglePhysics() {
+        physicsEnabled = !physicsEnabled;
+        network.setOptions({ physics: { enabled: physicsEnabled } });
+        document.getElementById('physics-status').innerText = physicsEnabled ? 'ON' : 'OFF';
+        document.getElementById('physics-toggle').style.background = physicsEnabled ? 
+            'rgba(74, 144, 226, 0.9)' : 'rgba(245, 166, 35, 0.9)';
+    }
+
+    network.on("click", function (params) {
+        if (params.nodes.length > 0) {
+            var nodeId = params.nodes[0];
+            
+            // Highlight neighbors logic
+            var connectedNodes = network.getConnectedNodes(nodeId);
+            var allNodes = nodes.get();
+            var nodesToUpdate = [];
+            
+            allNodes.forEach(function(node) {
+                if (node.id === nodeId) {
+                    node.color = { background: '#f5a623', border: '#d35400' };
+                    node.label = node.id;
+                } else if (connectedNodes.includes(node.id)) {
+                    node.color = { background: '#5dade2', border: '#2c3e50' };
+                    node.label = node.id;
+                } else {
+                    node.color = { background: 'rgba(74, 144, 226, 0.2)', border: 'rgba(44, 62, 80, 0.2)' };
+                    node.label = node.id;
+                }
+                nodesToUpdate.push(node);
+            });
+            nodes.update(nodesToUpdate);
+            
+        } else {
+            // Reset colors
+            var allNodes = nodes.get();
+            var nodesToUpdate = [];
+            allNodes.forEach(function(node) {
+                node.color = { background: '#4a90e2', border: '#2c3e50' };
+                node.label = node.id;
+                nodesToUpdate.push(node);
+            });
+            nodes.update(nodesToUpdate);
+        }
+    });
+</script>
+</body>
+</html>
