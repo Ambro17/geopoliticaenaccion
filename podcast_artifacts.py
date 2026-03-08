@@ -65,6 +65,18 @@ PODCAST_ARTIFACTS = {
         "transcript_path": "artifacts/2026-01-11-Venezuela.txt",
         "graph_path": "artifacts/2026-01-11-Venezuela.html",
         "podcast_link": "https://youtu.be/UKKF1_6Pcuo"
+    },
+    "PeleaDelSiglo I": {
+        "friendly_name": "EE.UU. vs China I: El Origen de la Pugna y la Trampa de Tucídides",
+        "mp3_path": "artifacts/2023-07-19-PeleaDelSiglo.m4a",
+        "transcript_path": "artifacts/2023-07-19-PeleaDelSiglo.txt",
+        "graph_path": "artifacts/2023-07-19-PeleaDelSiglo.html"
+    },
+    "PeleaDelSiglo II": {
+        "friendly_name": "EE.UU. vs China II: Los Cinco Tableros de la Guerra Total",
+        "mp3_path": "artifacts/2023-07-19-PeleaDelSiglo-II.m4a",
+        "transcript_path": "artifacts/2023-07-19-PeleaDelSiglo-II.txt",
+        "graph_path": "artifacts/2023-07-19-PeleaDelSiglo-II.html"
     }
 }
 
